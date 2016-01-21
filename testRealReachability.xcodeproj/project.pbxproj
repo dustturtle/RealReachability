@@ -1,0 +1,414 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		8EE0B6331C40F71900CBABCA /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 8EE0B6321C40F71900CBABCA /* main.m */; };
+		8EE0B6361C40F71900CBABCA /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 8EE0B6351C40F71900CBABCA /* AppDelegate.m */; };
+		8EE0B6391C40F71900CBABCA /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 8EE0B6381C40F71900CBABCA /* ViewController.m */; };
+		8EE0B63C1C40F71900CBABCA /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 8EE0B63A1C40F71900CBABCA /* Main.storyboard */; };
+		8EE0B63E1C40F71900CBABCA /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 8EE0B63D1C40F71900CBABCA /* Assets.xcassets */; };
+		8EE0B6411C40F71900CBABCA /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 8EE0B63F1C40F71900CBABCA /* LaunchScreen.storyboard */; };
+		8EFA08DA1C50E25800F6D790 /* LocalConnection.m in Sources */ = {isa = PBXBuildFile; fileRef = 8EFA08C01C50E25800F6D790 /* LocalConnection.m */; };
+		8EFA08DB1C50E25800F6D790 /* FSMEngine.m in Sources */ = {isa = PBXBuildFile; fileRef = 8EFA08C41C50E25800F6D790 /* FSMEngine.m */; };
+		8EFA08DC1C50E25800F6D790 /* FSMStateUtil.m in Sources */ = {isa = PBXBuildFile; fileRef = 8EFA08C61C50E25800F6D790 /* FSMStateUtil.m */; };
+		8EFA08DD1C50E25800F6D790 /* ReachState.m in Sources */ = {isa = PBXBuildFile; fileRef = 8EFA08C81C50E25800F6D790 /* ReachState.m */; };
+		8EFA08DE1C50E25800F6D790 /* ReachStateLoading.m in Sources */ = {isa = PBXBuildFile; fileRef = 8EFA08CA1C50E25800F6D790 /* ReachStateLoading.m */; };
+		8EFA08DF1C50E25800F6D790 /* ReachStateUnloaded.m in Sources */ = {isa = PBXBuildFile; fileRef = 8EFA08CC1C50E25800F6D790 /* ReachStateUnloaded.m */; };
+		8EFA08E01C50E25800F6D790 /* ReachStateUnReachable.m in Sources */ = {isa = PBXBuildFile; fileRef = 8EFA08CE1C50E25800F6D790 /* ReachStateUnReachable.m */; };
+		8EFA08E11C50E25800F6D790 /* ReachStateWIFI.m in Sources */ = {isa = PBXBuildFile; fileRef = 8EFA08D01C50E25800F6D790 /* ReachStateWIFI.m */; };
+		8EFA08E21C50E25800F6D790 /* ReachStateWWAN.m in Sources */ = {isa = PBXBuildFile; fileRef = 8EFA08D21C50E25800F6D790 /* ReachStateWWAN.m */; };
+		8EFA08E31C50E25800F6D790 /* PingFoundation.m in Sources */ = {isa = PBXBuildFile; fileRef = 8EFA08D51C50E25800F6D790 /* PingFoundation.m */; };
+		8EFA08E41C50E25800F6D790 /* PingHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = 8EFA08D71C50E25800F6D790 /* PingHelper.m */; };
+		8EFA08E51C50E25800F6D790 /* RealReachability.m in Sources */ = {isa = PBXBuildFile; fileRef = 8EFA08D91C50E25800F6D790 /* RealReachability.m */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		8EE0B62E1C40F71900CBABCA /* testRealReachability.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = testRealReachability.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		8EE0B6321C40F71900CBABCA /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
+		8EE0B6341C40F71900CBABCA /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
+		8EE0B6351C40F71900CBABCA /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
+		8EE0B6371C40F71900CBABCA /* ViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ViewController.h; sourceTree = "<group>"; };
+		8EE0B6381C40F71900CBABCA /* ViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ViewController.m; sourceTree = "<group>"; };
+		8EE0B63B1C40F71900CBABCA /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
+		8EE0B63D1C40F71900CBABCA /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		8EE0B6401C40F71900CBABCA /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
+		8EE0B6421C40F71900CBABCA /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		8EFA08BF1C50E25800F6D790 /* LocalConnection.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LocalConnection.h; sourceTree = "<group>"; };
+		8EFA08C01C50E25800F6D790 /* LocalConnection.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LocalConnection.m; sourceTree = "<group>"; };
+		8EFA08C21C50E25800F6D790 /* FSMDefines.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FSMDefines.h; sourceTree = "<group>"; };
+		8EFA08C31C50E25800F6D790 /* FSMEngine.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FSMEngine.h; sourceTree = "<group>"; };
+		8EFA08C41C50E25800F6D790 /* FSMEngine.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FSMEngine.m; sourceTree = "<group>"; };
+		8EFA08C51C50E25800F6D790 /* FSMStateUtil.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FSMStateUtil.h; sourceTree = "<group>"; };
+		8EFA08C61C50E25800F6D790 /* FSMStateUtil.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FSMStateUtil.m; sourceTree = "<group>"; };
+		8EFA08C71C50E25800F6D790 /* ReachState.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ReachState.h; sourceTree = "<group>"; };
+		8EFA08C81C50E25800F6D790 /* ReachState.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ReachState.m; sourceTree = "<group>"; };
+		8EFA08C91C50E25800F6D790 /* ReachStateLoading.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ReachStateLoading.h; sourceTree = "<group>"; };
+		8EFA08CA1C50E25800F6D790 /* ReachStateLoading.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ReachStateLoading.m; sourceTree = "<group>"; };
+		8EFA08CB1C50E25800F6D790 /* ReachStateUnloaded.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ReachStateUnloaded.h; sourceTree = "<group>"; };
+		8EFA08CC1C50E25800F6D790 /* ReachStateUnloaded.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ReachStateUnloaded.m; sourceTree = "<group>"; };
+		8EFA08CD1C50E25800F6D790 /* ReachStateUnReachable.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ReachStateUnReachable.h; sourceTree = "<group>"; };
+		8EFA08CE1C50E25800F6D790 /* ReachStateUnReachable.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ReachStateUnReachable.m; sourceTree = "<group>"; };
+		8EFA08CF1C50E25800F6D790 /* ReachStateWIFI.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ReachStateWIFI.h; sourceTree = "<group>"; };
+		8EFA08D01C50E25800F6D790 /* ReachStateWIFI.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ReachStateWIFI.m; sourceTree = "<group>"; };
+		8EFA08D11C50E25800F6D790 /* ReachStateWWAN.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ReachStateWWAN.h; sourceTree = "<group>"; };
+		8EFA08D21C50E25800F6D790 /* ReachStateWWAN.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ReachStateWWAN.m; sourceTree = "<group>"; };
+		8EFA08D41C50E25800F6D790 /* PingFoundation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PingFoundation.h; sourceTree = "<group>"; };
+		8EFA08D51C50E25800F6D790 /* PingFoundation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PingFoundation.m; sourceTree = "<group>"; };
+		8EFA08D61C50E25800F6D790 /* PingHelper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PingHelper.h; sourceTree = "<group>"; };
+		8EFA08D71C50E25800F6D790 /* PingHelper.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PingHelper.m; sourceTree = "<group>"; };
+		8EFA08D81C50E25800F6D790 /* RealReachability.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RealReachability.h; sourceTree = "<group>"; };
+		8EFA08D91C50E25800F6D790 /* RealReachability.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RealReachability.m; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		8EE0B62B1C40F71800CBABCA /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		8EE0B6251C40F71800CBABCA = {
+			isa = PBXGroup;
+			children = (
+				8EE0B6301C40F71900CBABCA /* testRealReachability */,
+				8EE0B62F1C40F71900CBABCA /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		8EE0B62F1C40F71900CBABCA /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				8EE0B62E1C40F71900CBABCA /* testRealReachability.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		8EE0B6301C40F71900CBABCA /* testRealReachability */ = {
+			isa = PBXGroup;
+			children = (
+				8EFA08BD1C50E25800F6D790 /* RealReachability */,
+				8EE0B6341C40F71900CBABCA /* AppDelegate.h */,
+				8EE0B6351C40F71900CBABCA /* AppDelegate.m */,
+				8EE0B6371C40F71900CBABCA /* ViewController.h */,
+				8EE0B6381C40F71900CBABCA /* ViewController.m */,
+				8EE0B63A1C40F71900CBABCA /* Main.storyboard */,
+				8EE0B63D1C40F71900CBABCA /* Assets.xcassets */,
+				8EE0B63F1C40F71900CBABCA /* LaunchScreen.storyboard */,
+				8EE0B6421C40F71900CBABCA /* Info.plist */,
+				8EE0B6311C40F71900CBABCA /* Supporting Files */,
+			);
+			path = testRealReachability;
+			sourceTree = "<group>";
+		};
+		8EE0B6311C40F71900CBABCA /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				8EE0B6321C40F71900CBABCA /* main.m */,
+			);
+			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+		8EFA08BD1C50E25800F6D790 /* RealReachability */ = {
+			isa = PBXGroup;
+			children = (
+				8EFA08BE1C50E25800F6D790 /* Connection */,
+				8EFA08C11C50E25800F6D790 /* FSM */,
+				8EFA08D31C50E25800F6D790 /* Ping */,
+				8EFA08D81C50E25800F6D790 /* RealReachability.h */,
+				8EFA08D91C50E25800F6D790 /* RealReachability.m */,
+			);
+			path = RealReachability;
+			sourceTree = SOURCE_ROOT;
+		};
+		8EFA08BE1C50E25800F6D790 /* Connection */ = {
+			isa = PBXGroup;
+			children = (
+				8EFA08BF1C50E25800F6D790 /* LocalConnection.h */,
+				8EFA08C01C50E25800F6D790 /* LocalConnection.m */,
+			);
+			path = Connection;
+			sourceTree = "<group>";
+		};
+		8EFA08C11C50E25800F6D790 /* FSM */ = {
+			isa = PBXGroup;
+			children = (
+				8EFA08C21C50E25800F6D790 /* FSMDefines.h */,
+				8EFA08C31C50E25800F6D790 /* FSMEngine.h */,
+				8EFA08C41C50E25800F6D790 /* FSMEngine.m */,
+				8EFA08C51C50E25800F6D790 /* FSMStateUtil.h */,
+				8EFA08C61C50E25800F6D790 /* FSMStateUtil.m */,
+				8EFA08C71C50E25800F6D790 /* ReachState.h */,
+				8EFA08C81C50E25800F6D790 /* ReachState.m */,
+				8EFA08C91C50E25800F6D790 /* ReachStateLoading.h */,
+				8EFA08CA1C50E25800F6D790 /* ReachStateLoading.m */,
+				8EFA08CB1C50E25800F6D790 /* ReachStateUnloaded.h */,
+				8EFA08CC1C50E25800F6D790 /* ReachStateUnloaded.m */,
+				8EFA08CD1C50E25800F6D790 /* ReachStateUnReachable.h */,
+				8EFA08CE1C50E25800F6D790 /* ReachStateUnReachable.m */,
+				8EFA08CF1C50E25800F6D790 /* ReachStateWIFI.h */,
+				8EFA08D01C50E25800F6D790 /* ReachStateWIFI.m */,
+				8EFA08D11C50E25800F6D790 /* ReachStateWWAN.h */,
+				8EFA08D21C50E25800F6D790 /* ReachStateWWAN.m */,
+			);
+			path = FSM;
+			sourceTree = "<group>";
+		};
+		8EFA08D31C50E25800F6D790 /* Ping */ = {
+			isa = PBXGroup;
+			children = (
+				8EFA08D41C50E25800F6D790 /* PingFoundation.h */,
+				8EFA08D51C50E25800F6D790 /* PingFoundation.m */,
+				8EFA08D61C50E25800F6D790 /* PingHelper.h */,
+				8EFA08D71C50E25800F6D790 /* PingHelper.m */,
+			);
+			path = Ping;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		8EE0B62D1C40F71800CBABCA /* testRealReachability */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 8EE0B6451C40F71900CBABCA /* Build configuration list for PBXNativeTarget "testRealReachability" */;
+			buildPhases = (
+				8EE0B62A1C40F71800CBABCA /* Sources */,
+				8EE0B62B1C40F71800CBABCA /* Frameworks */,
+				8EE0B62C1C40F71800CBABCA /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = testRealReachability;
+			productName = testRealReachability;
+			productReference = 8EE0B62E1C40F71900CBABCA /* testRealReachability.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		8EE0B6261C40F71800CBABCA /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 0710;
+				ORGANIZATIONNAME = QCStudio;
+				TargetAttributes = {
+					8EE0B62D1C40F71800CBABCA = {
+						CreatedOnToolsVersion = 7.1.1;
+					};
+				};
+			};
+			buildConfigurationList = 8EE0B6291C40F71800CBABCA /* Build configuration list for PBXProject "testRealReachability" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = 8EE0B6251C40F71800CBABCA;
+			productRefGroup = 8EE0B62F1C40F71900CBABCA /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				8EE0B62D1C40F71800CBABCA /* testRealReachability */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		8EE0B62C1C40F71800CBABCA /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				8EE0B6411C40F71900CBABCA /* LaunchScreen.storyboard in Resources */,
+				8EE0B63E1C40F71900CBABCA /* Assets.xcassets in Resources */,
+				8EE0B63C1C40F71900CBABCA /* Main.storyboard in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		8EE0B62A1C40F71800CBABCA /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				8EFA08E31C50E25800F6D790 /* PingFoundation.m in Sources */,
+				8EFA08DE1C50E25800F6D790 /* ReachStateLoading.m in Sources */,
+				8EFA08DD1C50E25800F6D790 /* ReachState.m in Sources */,
+				8EFA08E41C50E25800F6D790 /* PingHelper.m in Sources */,
+				8EE0B6391C40F71900CBABCA /* ViewController.m in Sources */,
+				8EE0B6361C40F71900CBABCA /* AppDelegate.m in Sources */,
+				8EE0B6331C40F71900CBABCA /* main.m in Sources */,
+				8EFA08DA1C50E25800F6D790 /* LocalConnection.m in Sources */,
+				8EFA08E51C50E25800F6D790 /* RealReachability.m in Sources */,
+				8EFA08DC1C50E25800F6D790 /* FSMStateUtil.m in Sources */,
+				8EFA08DB1C50E25800F6D790 /* FSMEngine.m in Sources */,
+				8EFA08E21C50E25800F6D790 /* ReachStateWWAN.m in Sources */,
+				8EFA08E01C50E25800F6D790 /* ReachStateUnReachable.m in Sources */,
+				8EFA08E11C50E25800F6D790 /* ReachStateWIFI.m in Sources */,
+				8EFA08DF1C50E25800F6D790 /* ReachStateUnloaded.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXVariantGroup section */
+		8EE0B63A1C40F71900CBABCA /* Main.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				8EE0B63B1C40F71900CBABCA /* Base */,
+			);
+			name = Main.storyboard;
+			sourceTree = "<group>";
+		};
+		8EE0B63F1C40F71900CBABCA /* LaunchScreen.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				8EE0B6401C40F71900CBABCA /* Base */,
+			);
+			name = LaunchScreen.storyboard;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
+/* Begin XCBuildConfiguration section */
+		8EE0B6431C40F71900CBABCA /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 9.1;
+				MTL_ENABLE_DEBUG_INFO = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+			};
+			name = Debug;
+		};
+		8EE0B6441C40F71900CBABCA /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 9.1;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				SDKROOT = iphoneos;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		8EE0B6461C40F71900CBABCA /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				INFOPLIST_FILE = testRealReachability/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = qc.testRealReachability;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		8EE0B6471C40F71900CBABCA /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				INFOPLIST_FILE = testRealReachability/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = qc.testRealReachability;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		8EE0B6291C40F71800CBABCA /* Build configuration list for PBXProject "testRealReachability" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				8EE0B6431C40F71900CBABCA /* Debug */,
+				8EE0B6441C40F71900CBABCA /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		8EE0B6451C40F71900CBABCA /* Build configuration list for PBXNativeTarget "testRealReachability" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				8EE0B6461C40F71900CBABCA /* Debug */,
+				8EE0B6471C40F71900CBABCA /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 8EE0B6261C40F71800CBABCA /* Project object */;
+}
