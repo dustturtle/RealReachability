@@ -20,6 +20,11 @@ extern NSString *const kPingResultNotification;
 
 + (instancetype)sharedInstance;
 
+/**
+ *  trigger a ping action with a completion block
+ *
+ *  @param completion : Async completion block
+ */
 - (void)pingWithBlock:(void (^)(BOOL isSuccess))completion;
 
 @end
