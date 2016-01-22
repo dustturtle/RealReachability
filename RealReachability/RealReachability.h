@@ -44,8 +44,11 @@ typedef NS_ENUM(NSInteger, ReachabilityStatus) {
 
 @interface RealReachability : NSObject
 
-// Please make sure this host is available for pinging!
+// Please make sure this host is available for pinging! default host:www.baidu.com
 @property (nonatomic, copy) NSString *hostForPing;
+
+// Interval in minutes; default is 2.0f
+@property (nonatomic, assign) float autoCheckInterval;
 
 + (instancetype)sharedInstance;
 

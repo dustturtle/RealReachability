@@ -63,6 +63,7 @@ NSString *const kPingResultNotification = @"kPingResultNotification";
 
 - (void)pingWithBlock:(void (^)(BOOL isSuccess))completion
 {
+    //NSLog(@"pingWithBlock");
     if (completion)
     {
         // Temp: need to copy the block?
@@ -74,9 +75,24 @@ NSString *const kPingResultNotification = @"kPingResultNotification";
     
     if (!self.isPinging)
     {
-        self.isPinging = YES;
-        [self.pingFoundation start];
-        [self performSelector:@selector(pingTimeOut) withObject:nil afterDelay:2.0f];
+        // MUST make sure pingFoundation in mainThread
+        __weak __typeof(self)weakSelf = self;
+        if (![[NSThread currentThread] isMainThread]) {
+            dispatch_sync(dispatch_get_main_queue(), ^{
+                __strong __typeof(weakSelf)strongSelf = weakSelf;
+                strongSelf.isPinging = YES;
+                [strongSelf.pingFoundation start];
+                
+                [strongSelf performSelector:@selector(pingTimeOut) withObject:nil afterDelay:2.0f];
+            });
+        }
+        else
+        {
+            self.isPinging = YES;
+            [self.pingFoundation start];
+            
+            [self performSelector:@selector(pingTimeOut) withObject:nil afterDelay:2.0f];
+        }
     }
 }
 
@@ -88,7 +104,7 @@ NSString *const kPingResultNotification = @"kPingResultNotification";
     self.pingFoundation.delegate = nil;
     self.pingFoundation = nil;
     
-    self.pingFoundation = [PingFoundation pingFoundationWithHostName:host];
+    self.pingFoundation = [PingFoundation pingFoundationWithHostName:_host];
     self.pingFoundation.delegate = self;
 }
 
@@ -96,6 +112,11 @@ NSString *const kPingResultNotification = @"kPingResultNotification";
 
 - (void)endWithFlag:(BOOL)isSuccess
 {
+    if (!self.isPinging)
+    {
+        return;
+    }
+    
     self.isPinging = NO;
     [self.pingFoundation stop];
     

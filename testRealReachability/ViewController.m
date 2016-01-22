@@ -7,11 +7,7 @@
 //
 
 #import "ViewController.h"
-#import "LocalConnection.h"
-
 #import "RealReachability.h"
-
-#import "PingHelper.h"
 
 @interface ViewController ()
 
@@ -39,6 +35,36 @@
     // Dispose of any resources that can be recreated.
 }
 
+- (IBAction)testAction:(id)sender
+{
+    [GLobalRealReachability reachabilityWithBlock:^(ReachabilityStatus status) {
+        switch (status)
+        {
+            case NotReachable:
+            {
+                [[[UIAlertView alloc] initWithTitle:@"RealReachability" message:@"Nothing to do! offlineMode" delegate:self cancelButtonTitle:@"OK" otherButtonTitles:nil , nil] show];
+                break;
+            }
+                
+            case ReachableViaWiFi:
+            {
+                [[[UIAlertView alloc] initWithTitle:@"RealReachability" message:@"Do what you want! free!" delegate:self cancelButtonTitle:@"OK" otherButtonTitles:nil , nil] show];
+                break;
+            }
+                
+            case ReachableViaWWAN:
+            {
+                [[[UIAlertView alloc] initWithTitle:@"RealReachability" message:@"Take care of your money! You are in charge!" delegate:self cancelButtonTitle:@"OK" otherButtonTitles:nil , nil] show];
+                break;
+            }
+                
+            default:
+                break;
+        }
+    }];
+    
+}
+
 - (void)networkChanged:(NSNotification *)notification
 {
     RealReachability *reachability = (RealReachability *)notification.object;
@@ -59,6 +85,5 @@
     {
         self.flagLabel.text = @"Network WWAN! In charge!";
     }
-    
 }
 @end

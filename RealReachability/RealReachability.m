@@ -16,12 +16,15 @@
 #endif
 
 #define kDefaultHost @"www.baidu.com"
+#define kDefaultCheckInterval 2.0f
 
 NSString *const kRealReachabilityChangedNotification = @"kRealReachabilityChangedNotification";
 
 @interface RealReachability()
 
 @property (nonatomic, strong) FSMEngine *engine;
+
+@property (nonatomic, assign) BOOL isNotifying;
 
 @end
 
@@ -37,6 +40,7 @@ NSString *const kRealReachabilityChangedNotification = @"kRealReachabilityChange
         [_engine start];
         
         _hostForPing = kDefaultHost;
+        _autoCheckInterval = kDefaultCheckInterval;
     }
     return self;
 }
@@ -75,6 +79,9 @@ NSString *const kRealReachabilityChangedNotification = @"kRealReachabilityChange
                                                object:nil];
     
     GPingHelper.host = _hostForPing;
+    self.isNotifying = YES;
+    
+    [self autoCheckReachability];
 }
 
 - (void)stopNotifier
@@ -83,6 +90,8 @@ NSString *const kRealReachabilityChangedNotification = @"kRealReachabilityChange
     [self.engine reciveInput:inputDic];
     
     [GLocalConnection stopNotifier];
+    
+    self.isNotifying = NO;
 }
 
 #pragma mark - outside invoke
@@ -115,20 +124,24 @@ NSString *const kRealReachabilityChangedNotification = @"kRealReachabilityChange
                  case RRStateUnReachable:
                  {
                      asyncHandler(NotReachable);
+                     break;
                  }
                  case RRStateWIFI:
                  {
                      asyncHandler(ReachableViaWiFi);
+                     break;
                  }
                  case RRStateWWAN:
                  {
                      asyncHandler(ReachableViaWWAN);
+                     break;
                  }
                      
                  default:
                  {
                      NSLog(@"warning! reachState uncertain! state unmatched, treat as unreachable temporary");
                      asyncHandler(NotReachable);
+                     break;
                  }
              }
          }
@@ -194,6 +207,23 @@ NSString *const kRealReachabilityChangedNotification = @"kRealReachabilityChange
             return @"";
         }
     }
+}
+
+// auto checking after every autoCheckInterval minutes
+- (void)autoCheckReachability
+{
+    if (!self.isNotifying)
+    {
+        return;
+    }
+    
+    dispatch_time_t time = dispatch_time(DISPATCH_TIME_NOW, self.autoCheckInterval*60*NSEC_PER_SEC);
+    __weak __typeof(self)weakSelf = self;
+    dispatch_after(time, dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+        __strong __typeof(weakSelf)strongSelf = weakSelf;
+        [strongSelf reachabilityWithBlock:nil];
+        [strongSelf autoCheckReachability];
+    });
 }
 
 #pragma mark - Notification observer

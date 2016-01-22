@@ -566,7 +566,7 @@ static void HostResolveCallback(CFHostRef theHost, CFHostInfoType typeInfo, cons
 {
     PingFoundation *    obj;
     
-    NSLog(@">HostResolveCallback");
+    //NSLog(@">HostResolveCallback");
     
     obj = (__bridge PingFoundation *) info;
     assert([obj isKindOfClass:[PingFoundation class]]);
@@ -611,9 +611,9 @@ static void HostResolveCallback(CFHostRef theHost, CFHostInfoType typeInfo, cons
         
         CFHostScheduleWithRunLoop(self->_host, CFRunLoopGetCurrent(), kCFRunLoopDefaultMode);
         
-        NSLog(@">CFHostStartInfoResolution");
+        //NSLog(@">CFHostStartInfoResolution");
         success = CFHostStartInfoResolution(self->_host, kCFHostAddresses, &streamError);
-        NSLog(@"<CFHostStartInfoResolution");
+        //NSLog(@"<CFHostStartInfoResolution");
         if ( ! success )
         {
             [self didFailWithHostStreamError:streamError];
