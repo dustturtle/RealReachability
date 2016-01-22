@@ -26,14 +26,7 @@
         case RREventPingCallback:
         {
             NSNumber *eventParam = event[kEventKeyParam];
-            if ([eventParam boolValue])
-            {
-                resStateID = RRStateWWAN;
-            }
-            else
-            {
-                resStateID = RRStateUnReachable;
-            }
+            resStateID = [FSMStateUtil RRStateFromPingFlag:[eventParam boolValue]];
             break;
         }
         case RREventLocalConnectionCallback:

@@ -26,15 +26,7 @@
         case RREventPingCallback:
         {
             NSNumber *eventParam = event[kEventKeyParam];
-            if ([eventParam boolValue])
-            {
-                resStateID = RRStateUnReachable;
-                NSLog(@"warning! reachState uncertain! receive ping callback when unreachable!");
-            }
-            else
-            {
-                resStateID = RRStateUnReachable;
-            }
+            resStateID = [FSMStateUtil RRStateFromPingFlag:[eventParam boolValue]];
             break;
         }
         case RREventLocalConnectionCallback:

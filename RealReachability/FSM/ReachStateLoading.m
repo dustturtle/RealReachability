@@ -26,15 +26,7 @@
         case RREventPingCallback:
         {
             NSNumber *eventParam = event[kEventKeyParam];
-            if ([eventParam boolValue])
-            {
-                // abnormal, remain loading state
-                NSLog(@"warning! reachState uncertain! receive ping callback when loading!");
-            }
-            else
-            {
-                resStateID = RRStateUnReachable;
-            }
+            resStateID = [FSMStateUtil RRStateFromPingFlag:[eventParam boolValue]];
             break;
         }
         case RREventLocalConnectionCallback:

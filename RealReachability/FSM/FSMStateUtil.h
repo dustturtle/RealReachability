@@ -13,4 +13,6 @@
 
 + (RRStateID)RRStateFromValue:(NSString *)LCEventValue;
 
++ (RRStateID)RRStateFromPingFlag:(BOOL)isSuccess;
+
 @end
