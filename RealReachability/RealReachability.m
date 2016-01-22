@@ -10,6 +10,7 @@
 #import "FSM/FSMEngine.h"
 #import "Connection/LocalConnection.h"
 #import "Ping/PingHelper.h"
+#import <UIKit/UIKit.h>
 
 #if (!defined(DEBUG))
 #define NSLog(...)
@@ -41,15 +42,32 @@ NSString *const kRealReachabilityChangedNotification = @"kRealReachabilityChange
         
         _hostForPing = kDefaultHost;
         _autoCheckInterval = kDefaultCheckInterval;
+        
+        [[NSNotificationCenter defaultCenter] addObserver:self
+                                                 selector:@selector(appBecomeActive)
+                                                     name:UIApplicationDidBecomeActiveNotification
+                                                   object:nil];
     }
     return self;
 }
 
 - (void)dealloc
 {
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
+    
     self.engine = nil;
     
     [GLocalConnection stopNotifier];
+}
+
+#pragma mark - Handle system event
+
+- (void)appBecomeActive
+{
+    if (self.isNotifying)
+    {
+        [self reachabilityWithBlock:nil];
+    }
 }
 
 #pragma mark - Singlton Method
