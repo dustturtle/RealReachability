@@ -41,9 +41,9 @@
 
 - (void)networkChanged:(NSNotification *)notification
 {
-    RealReachability *rr = (RealReachability *)notification.object;
-    ReachabilityStatus status = [rr currentReachabilityStatus];
-    NSLog(@"%@",@(status));
+    RealReachability *reachability = (RealReachability *)notification.object;
+    ReachabilityStatus status = [reachability currentReachabilityStatus];
+    NSLog(@"currentStatus:%@",@(status));
     
     if (status == NotReachable)
     {
@@ -52,12 +52,12 @@
     
     if (status == ReachableViaWiFi)
     {
-        self.flagLabel.text = @"Network wifi!Free!";
+        self.flagLabel.text = @"Network wifi! Free!";
     }
     
     if (status == ReachableViaWWAN)
     {
-        self.flagLabel.text = @"Network WWAN!In charge!";
+        self.flagLabel.text = @"Network WWAN! In charge!";
     }
     
 }
