@@ -52,12 +52,12 @@
     
     if (status == ReachableViaWiFi)
     {
-        self.flagLabel.text = @"Network wifi! free!";
+        self.flagLabel.text = @"Network wifi!Free!";
     }
     
     if (status == ReachableViaWWAN)
     {
-        self.flagLabel.text = @"Network WWAN! take care of the charge!";
+        self.flagLabel.text = @"Network WWAN!In charge!";
     }
     
 }
