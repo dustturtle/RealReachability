@@ -35,6 +35,8 @@ NSString *const kRealReachabilityChangedNotification = @"kRealReachabilityChange
     {
         _engine = [[FSMEngine alloc] init];
         [_engine start];
+        
+        _hostForPing = kDefaultHost;
     }
     return self;
 }
@@ -72,7 +74,7 @@ NSString *const kRealReachabilityChangedNotification = @"kRealReachabilityChange
                                                  name:kLocalConnectionChangedNotification
                                                object:nil];
     
-    GPingHelper.host = kDefaultHost;
+    GPingHelper.host = _hostForPing;
 }
 
 - (void)stopNotifier
