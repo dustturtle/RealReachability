@@ -7,9 +7,9 @@
 //
 
 #import "RealReachability.h"
-#import "FSM/FSMEngine.h"
-#import "Connection/LocalConnection.h"
-#import "Ping/PingHelper.h"
+#import "FSMEngine.h"
+#import "LocalConnection.h"
+#import "PingHelper.h"
 #import <UIKit/UIKit.h>
 
 #if (!defined(DEBUG))
