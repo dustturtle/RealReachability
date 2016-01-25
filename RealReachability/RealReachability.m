@@ -17,7 +17,7 @@
 #endif
 
 #define kDefaultHost @"www.baidu.com"
-#define kDefaultCheckInterval 2.0f
+#define kDefaultCheckInterval 1.0f
 
 NSString *const kRealReachabilityChangedNotification = @"kRealReachabilityChangedNotification";
 
