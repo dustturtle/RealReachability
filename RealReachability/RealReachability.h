@@ -30,9 +30,9 @@
 
 #define GLobalRealReachability [RealReachability sharedInstance]
 
-//This notification was called only when reachability really changed;
-//We use FSM to promise this for you;
-//We post self to this notification, then you can invoke currentReachabilityStatus method to fetch current status.
+///This notification was called only when reachability really changed;
+///We use FSM to promise this for you;
+///We post self to this notification, then you can invoke currentReachabilityStatus method to fetch current status.
 extern NSString *const kRealReachabilityChangedNotification;
 
 typedef NS_ENUM(NSInteger, ReachabilityStatus) {
@@ -44,10 +44,10 @@ typedef NS_ENUM(NSInteger, ReachabilityStatus) {
 
 @interface RealReachability : NSObject
 
-// Please make sure this host is available for pinging! default host:www.baidu.com
+/// Please make sure this host is available for pinging! default host:www.baidu.com
 @property (nonatomic, copy) NSString *hostForPing;
 
-// Interval in minutes; default is 1.0f
+/// Interval in minutes; default is 1.0f
 @property (nonatomic, assign) float autoCheckInterval;
 
 + (instancetype)sharedInstance;

@@ -35,7 +35,7 @@ typedef enum
     RREventPingCallback
 }RREventID;
 
-// FSM error codes below
+/// FSM error codes below
 #define kFSMErrorNotAccept 13
 
 #endif /* FSMDefine_h */

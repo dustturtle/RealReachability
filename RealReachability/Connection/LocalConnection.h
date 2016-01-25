@@ -11,8 +11,8 @@
 
 #define GLocalConnection [LocalConnection sharedInstance]
 
-// We post self to this notification,
-// then you should invoke currentLocalConnectionStatus method to fetch current status.
+/// We post self to this notification,
+/// then you should invoke currentLocalConnectionStatus method to fetch current status.
 extern NSString *const kLocalConnectionChangedNotification;
 
 typedef NS_ENUM(NSInteger, LocalConnectionStatus)
