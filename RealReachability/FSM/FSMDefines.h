@@ -1,10 +1,10 @@
 //
 //  FSMDefines.h
 //  RealReachability
-//  Defines of FSM
+//  Defines of FSM (finite state machine)
 //
 //  Created by Dustturtle on 16/1/19.
-//  Copyright © 2016 QCStudio. All rights reserved.
+//  Copyright © 2016 Dustturtle. All rights reserved.
 //
 
 #ifndef FSMDefine_h

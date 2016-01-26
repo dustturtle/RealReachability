@@ -4,7 +4,7 @@
 //  Only handle events here: receive event in state,then transfer current state.
 //
 //  Created by Dustturtle on 16/1/19.
-//  Copyright © 2016 QCStudio. All rights reserved.
+//  Copyright © 2016 Dustturtle. All rights reserved.
 //
 
 #import <Foundation/Foundation.h>
