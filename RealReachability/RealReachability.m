@@ -3,7 +3,7 @@
 //  RealReachability
 //
 //  Created by Dustturtle on 16/1/9.
-//  Copyright © 2016 QCStudio. All rights reserved.
+//  Copyright © 2016 Dustturtle. All rights reserved.
 //
 
 #import "RealReachability.h"
@@ -87,6 +87,14 @@ NSString *const kRealReachabilityChangedNotification = @"kRealReachabilityChange
 
 - (void)startNotifier
 {
+    if (self.isNotifying)
+    {
+        // avoid duplicate action
+        return;
+    }
+    
+    self.isNotifying = YES;
+    
     NSDictionary *inputDic = @{kEventKeyID:@(RREventLoad)};
     [self.engine reciveInput:inputDic];
     
@@ -97,8 +105,6 @@ NSString *const kRealReachabilityChangedNotification = @"kRealReachabilityChange
                                                object:nil];
     
     GPingHelper.host = _hostForPing;
-    self.isNotifying = YES;
-    
     [self autoCheckReachability];
 }
 
