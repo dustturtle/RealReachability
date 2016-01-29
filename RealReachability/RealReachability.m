@@ -190,6 +190,11 @@ NSString *const kRealReachabilityChangedNotification = @"kRealReachabilityChange
         {
             return ReachableViaWWAN;
         }
+        case RRStateLoading:
+        {
+            // status on loading, return local status temporary.
+            return (ReachabilityStatus)(GLocalConnection.currentLocalConnectionStatus);
+        }
             
         default:
         {
