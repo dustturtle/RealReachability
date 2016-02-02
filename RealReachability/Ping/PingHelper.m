@@ -75,6 +75,9 @@ NSString *const kPingResultNotification = @"kPingResultNotification";
     
     if (!self.isPinging)
     {
+        // safe protection for exceptional situation, background app or multi-thread, eg.
+        [self.pingFoundation stop];
+        
         // MUST make sure pingFoundation in mainThread
         __weak __typeof(self)weakSelf = self;
         if (![[NSThread currentThread] isMainThread]) {
