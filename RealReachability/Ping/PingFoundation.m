@@ -602,10 +602,10 @@ static void HostResolveCallback(CFHostRef theHost, CFHostInfoType typeInfo, cons
         CFHostClientContext context = {0, (__bridge void *)(self), NULL, NULL, NULL};
         CFStreamError       streamError;
         
-        assert(self->_host == NULL);
+        //assert(self->_host == NULL);
         
         self->_host = CFHostCreateWithName(NULL, (__bridge CFStringRef) self.hostName);
-        assert(self->_host != NULL);
+        //assert(self->_host != NULL);
         
         CFHostSetClient(self->_host, HostResolveCallback, &context);
         
