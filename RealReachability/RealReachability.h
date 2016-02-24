@@ -1,6 +1,6 @@
 //
 //  RealReachability.h
-//  Version 1.0.0
+//  Version 1.1.0
 //
 //  Created by Dustturtle on 16/1/9.
 //  Copyright (c) 2016 Dustturtle. All rights reserved.
@@ -36,10 +36,10 @@
 extern NSString *const kRealReachabilityChangedNotification;
 
 typedef NS_ENUM(NSInteger, ReachabilityStatus) {
-    // Apple NetworkStatus Compatible Names.
-    NotReachable = 0,
-    ReachableViaWWAN = 1,
-    ReachableViaWiFi = 2
+    ///Direct match with Apple networkStatus, just a force type convert.
+    RealStatusNotReachable = 0,
+    RealStatusViaWWAN = 1,
+    RealStatusViaWiFi = 2
 };
 
 @interface RealReachability : NSObject

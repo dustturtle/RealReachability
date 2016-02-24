@@ -40,19 +40,19 @@
     [GLobalRealReachability reachabilityWithBlock:^(ReachabilityStatus status) {
         switch (status)
         {
-            case NotReachable:
+            case RealStatusNotReachable:
             {
                 [[[UIAlertView alloc] initWithTitle:@"RealReachability" message:@"Nothing to do! offlineMode" delegate:self cancelButtonTitle:@"OK" otherButtonTitles:nil , nil] show];
                 break;
             }
                 
-            case ReachableViaWiFi:
+            case RealStatusViaWiFi:
             {
                 [[[UIAlertView alloc] initWithTitle:@"RealReachability" message:@"Do what you want! free!" delegate:self cancelButtonTitle:@"OK" otherButtonTitles:nil , nil] show];
                 break;
             }
                 
-            case ReachableViaWWAN:
+            case RealStatusViaWWAN:
             {
                 [[[UIAlertView alloc] initWithTitle:@"RealReachability" message:@"Take care of your money! You are in charge!" delegate:self cancelButtonTitle:@"OK" otherButtonTitles:nil , nil] show];
                 break;
@@ -71,17 +71,17 @@
     ReachabilityStatus status = [reachability currentReachabilityStatus];
     NSLog(@"currentStatus:%@",@(status));
     
-    if (status == NotReachable)
+    if (status == RealStatusNotReachable)
     {
         self.flagLabel.text = @"Network unreachable!";
     }
     
-    if (status == ReachableViaWiFi)
+    if (status == RealStatusViaWiFi)
     {
         self.flagLabel.text = @"Network wifi! Free!";
     }
     
-    if (status == ReachableViaWWAN)
+    if (status == RealStatusViaWWAN)
     {
         self.flagLabel.text = @"Network WWAN! In charge!";
     }

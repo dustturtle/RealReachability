@@ -147,24 +147,24 @@ NSString *const kRealReachabilityChangedNotification = @"kRealReachabilityChange
              {
                  case RRStateUnReachable:
                  {
-                     asyncHandler(NotReachable);
+                     asyncHandler(RealStatusNotReachable);
                      break;
                  }
                  case RRStateWIFI:
                  {
-                     asyncHandler(ReachableViaWiFi);
+                     asyncHandler(RealStatusViaWiFi);
                      break;
                  }
                  case RRStateWWAN:
                  {
-                     asyncHandler(ReachableViaWWAN);
+                     asyncHandler(RealStatusViaWWAN);
                      break;
                  }
                      
                  default:
                  {
                      NSLog(@"warning! reachState uncertain! state unmatched, treat as unreachable temporary");
-                     asyncHandler(NotReachable);
+                     asyncHandler(RealStatusNotReachable);
                      break;
                  }
              }
@@ -180,15 +180,15 @@ NSString *const kRealReachabilityChangedNotification = @"kRealReachabilityChange
     {
         case RRStateUnReachable:
         {
-            return NotReachable;
+            return RealStatusNotReachable;
         }
         case RRStateWIFI:
         {
-            return ReachableViaWiFi;
+            return RealStatusViaWiFi;
         }
         case RRStateWWAN:
         {
-            return ReachableViaWWAN;
+            return RealStatusViaWWAN;
         }
         case RRStateLoading:
         {
@@ -199,7 +199,7 @@ NSString *const kRealReachabilityChangedNotification = @"kRealReachabilityChange
         default:
         {
             NSLog(@"No normal status matched, return unreachable temporary");
-            return NotReachable;
+            return RealStatusNotReachable;
         }
     }
 }
