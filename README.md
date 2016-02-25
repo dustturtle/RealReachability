@@ -4,18 +4,18 @@
 [![Platform](https://img.shields.io/badge/Platform-iOS-orange.svg)](http://cocoadocs.org/docsets/RealReachability/1.1.1/)
 [![Platform](https://img.shields.io/badge/Build-Passed-green.svg)](http://cocoadocs.org/docsets/RealReachability/1.1.1/)
 ####We need to observe the REAL reachability of network for iOS. That's what RealReachability do.
-#Why RealReachablity?
-As we know, we already have reachablity framework for us to choose. Such as the famous repository [Reachability](https://github.com/tonymillion/Reachability).
+#Why RealReachability?
+As we know, we already have reachability framework for us to choose. Such as the famous repository [Reachability](https://github.com/tonymillion/Reachability).
 
-**BUT we really need a tool for us to get the reachablity, not the local connection!**
+**BUT we really need a tool for us to get the reachability, not the local connection!**
 
-**Apple doc tells us somthing about SCNetworkReachability API:
+**Apple doc tells us something about SCNetworkReachability API:
 "Note that reachability does not guarantee that the data packet will actually be received by the host."**
 
 The called "reachability" we already know can only tell us the local connection status.These tools current we know are all supported by the SCNetworkReachability API.
 
 
-**Now [RealReachablity](https://github.com/dustturtle/RealReachability) can do this for you~**
+**Now [RealReachability](https://github.com/dustturtle/RealReachability) can do this for you~**
 
 We introduce ping module for us to check the real network status, together with SCNetworkReachability API. And we use FSM(finite state machine) to control all of the network status to confirm that only status change will be sent to application.
 
