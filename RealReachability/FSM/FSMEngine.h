@@ -24,7 +24,7 @@
  *
  *  @return -1 -> no state changed, 0 ->state changed
  */
-- (NSInteger)reciveInput:(NSDictionary *)dic;
+- (NSInteger)receiveInput:(NSDictionary *)dic;
 
 - (BOOL)isCurrentStateAvailable;
 @end
