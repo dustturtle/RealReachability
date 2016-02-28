@@ -96,7 +96,7 @@ NSString *const kRealReachabilityChangedNotification = @"kRealReachabilityChange
     self.isNotifying = YES;
     
     NSDictionary *inputDic = @{kEventKeyID:@(RREventLoad)};
-    [self.engine reciveInput:inputDic];
+    [self.engine receiveInput:inputDic];
     
     [GLocalConnection startNotifier];
     [[NSNotificationCenter defaultCenter] addObserver:self
@@ -111,7 +111,7 @@ NSString *const kRealReachabilityChangedNotification = @"kRealReachabilityChange
 - (void)stopNotifier
 {
     NSDictionary *inputDic = @{kEventKeyID:@(RREventUnLoad)};
-    [self.engine reciveInput:inputDic];
+    [self.engine receiveInput:inputDic];
     
     [GLocalConnection stopNotifier];
     
@@ -127,7 +127,7 @@ NSString *const kRealReachabilityChangedNotification = @"kRealReachabilityChange
      {
          __strong __typeof(weakSelf)strongSelf = weakSelf;
          NSDictionary *inputDic = @{kEventKeyID:@(RREventPingCallback), kEventKeyParam:@(isSuccess)};
-         NSInteger rtn = [strongSelf.engine reciveInput:inputDic];
+         NSInteger rtn = [strongSelf.engine receiveInput:inputDic];
          if (rtn == 0) // state changed & state available, post notification.
          {
              if ([self.engine isCurrentStateAvailable])
@@ -263,7 +263,7 @@ NSString *const kRealReachabilityChangedNotification = @"kRealReachabilityChange
     NSLog(@"currentLocalConnectionStatus:%@",@(lcStatus));
     
     NSDictionary *inputDic = @{kEventKeyID:@(RREventLocalConnectionCallback), kEventKeyParam:[self paramValueFromStatus:lcStatus]};
-    NSInteger rtn = [self.engine reciveInput:inputDic];
+    NSInteger rtn = [self.engine receiveInput:inputDic];
     
     if (rtn == 0) // state changed & state available, post notification.
     {

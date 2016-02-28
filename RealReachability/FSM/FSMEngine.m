@@ -47,7 +47,7 @@
     self.currentStateID = RRStateUnloaded;
 }
 
-- (NSInteger)reciveInput:(NSDictionary *)dic
+- (NSInteger)receiveInput:(NSDictionary *)dic
 {
     NSError *error = nil;
     ReachState *currentState = self.allStates[self.currentStateID];
