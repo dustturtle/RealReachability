@@ -12,7 +12,7 @@ As we know, we already have reachability framework for us to choose. Such as the
 **Apple doc tells us something about SCNetworkReachability API:
 "Note that reachability does not guarantee that the data packet will actually be received by the host."**
 
-The called "reachability" we already know can only tell us the local connection status.These tools current we know are all supported by the SCNetworkReachability API.
+The called "reachability" we already know can only tell us the local connection status.These tools currently we know are all supported by the SCNetworkReachability API.
 
 
 **Now [RealReachability](https://github.com/dustturtle/RealReachability) can do this for you~**
