@@ -21,6 +21,7 @@
 {
     [super viewDidLoad];
     // Do any additional setup after loading the view, typically from a nib.
+
     
     [GLobalRealReachability startNotifier];
     [[NSNotificationCenter defaultCenter] addObserver:self
@@ -55,6 +56,25 @@
             case RealStatusViaWWAN:
             {
                 [[[UIAlertView alloc] initWithTitle:@"RealReachability" message:@"Take care of your money! You are in charge!" delegate:self cancelButtonTitle:@"OK" otherButtonTitles:nil , nil] show];
+                
+                WWANAccessType accessType = [GLobalRealReachability currentWWANtype];
+                if (accessType == WWANType2G)
+                {
+                    self.flagLabel.text = @"RealReachabilityStatus2G";
+                }
+                else if (accessType == WWANType3G)
+                {
+                    self.flagLabel.text = @"RealReachabilityStatus3G";
+                }
+                else if (accessType == WWANType4G)
+                {
+                    self.flagLabel.text = @"RealReachabilityStatus4G";
+                }
+                else
+                {
+                    self.flagLabel.text = @"Unknown RealReachability WWAN Status, might be iOS6";
+                }
+                
                 break;
             }
                 
@@ -62,7 +82,6 @@
                 break;
         }
     }];
-    
 }
 
 - (void)networkChanged:(NSNotification *)notification
@@ -85,5 +104,28 @@
     {
         self.flagLabel.text = @"Network WWAN! In charge!";
     }
+    
+    WWANAccessType accessType = [GLobalRealReachability currentWWANtype];
+    
+    if (status == RealStatusViaWWAN)
+    {
+        if (accessType == WWANType2G)
+        {
+            self.flagLabel.text = @"RealReachabilityStatus2G";
+        }
+        else if (accessType == WWANType3G)
+        {
+            self.flagLabel.text = @"RealReachabilityStatus3G";
+        }
+        else if (accessType == WWANType4G)
+        {
+            self.flagLabel.text = @"RealReachabilityStatus4G";
+        }
+        else
+        {
+            self.flagLabel.text = @"Unknown RealReachability WWAN Status, might be iOS6";
+        }
+    }
 }
+
 @end

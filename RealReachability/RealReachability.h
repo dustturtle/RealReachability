@@ -42,12 +42,19 @@ typedef NS_ENUM(NSInteger, ReachabilityStatus) {
     RealStatusViaWiFi = 2
 };
 
+typedef NS_ENUM(NSInteger, WWANAccessType) {
+    WWANTypeUnknown = -1, /// maybe iOS6
+    WWANType4G = 0,
+    WWANType3G = 1,
+    WWANType2G = 3
+};
+
 @interface RealReachability : NSObject
 
 /// Please make sure this host is available for pinging! default host:www.baidu.com
 @property (nonatomic, copy) NSString *hostForPing;
 
-/// Interval in minutes; default is 1.0f
+/// Interval in minutes; default is 2.0f
 @property (nonatomic, assign) float autoCheckInterval;
 
 + (instancetype)sharedInstance;
@@ -71,5 +78,14 @@ typedef NS_ENUM(NSInteger, ReachabilityStatus) {
  */
 - (ReachabilityStatus)currentReachabilityStatus;
 
+/**
+ *  Return current WWAN type immediately.
+ *
+ *  @return unknown/4g/3g/2g.
+ *
+ *  This method can be used to improve app's further network performance
+ *  (different strategies for different WWAN types).
+ */
+- (WWANAccessType)currentWWANtype;
 
 @end

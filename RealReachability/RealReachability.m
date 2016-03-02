@@ -11,22 +11,24 @@
 #import "LocalConnection.h"
 #import "PingHelper.h"
 #import <UIKit/UIKit.h>
+#import <CoreTelephony/CTTelephonyNetworkInfo.h>
 
 #if (!defined(DEBUG))
 #define NSLog(...)
 #endif
 
 #define kDefaultHost @"www.baidu.com"
-#define kDefaultCheckInterval 1.0f
+#define kDefaultCheckInterval 2.0f
 
 NSString *const kRealReachabilityChangedNotification = @"kRealReachabilityChangedNotification";
 
 @interface RealReachability()
-
 @property (nonatomic, strong) FSMEngine *engine;
-
 @property (nonatomic, assign) BOOL isNotifying;
 
+@property (nonatomic,strong) NSArray *typeStrings4G;
+@property (nonatomic,strong) NSArray *typeStrings3G;
+@property (nonatomic,strong) NSArray *typeStrings2G;
 @end
 
 @implementation RealReachability
@@ -39,6 +41,20 @@ NSString *const kRealReachabilityChangedNotification = @"kRealReachabilityChange
     {
         _engine = [[FSMEngine alloc] init];
         [_engine start];
+        
+        _typeStrings2G = @[CTRadioAccessTechnologyEdge,
+                           CTRadioAccessTechnologyGPRS,
+                           CTRadioAccessTechnologyCDMA1x];
+        
+        _typeStrings3G = @[CTRadioAccessTechnologyHSDPA,
+                           CTRadioAccessTechnologyWCDMA,
+                           CTRadioAccessTechnologyHSUPA,
+                           CTRadioAccessTechnologyCDMAEVDORev0,
+                           CTRadioAccessTechnologyCDMAEVDORevA,
+                           CTRadioAccessTechnologyCDMAEVDORevB,
+                           CTRadioAccessTechnologyeHRPD];
+        
+        _typeStrings4G = @[CTRadioAccessTechnologyLTE];
         
         _hostForPing = kDefaultHost;
         _autoCheckInterval = kDefaultCheckInterval;
@@ -212,6 +228,27 @@ NSString *const kRealReachabilityChangedNotification = @"kRealReachabilityChange
     GPingHelper.host = _hostForPing;
 }
 
+- (WWANAccessType)currentWWANtype
+{
+    if ([[[UIDevice currentDevice] systemVersion] floatValue] >= 7.0)
+    {
+        CTTelephonyNetworkInfo *teleInfo= [[CTTelephonyNetworkInfo alloc] init];
+        NSString *accessString = teleInfo.currentRadioAccessTechnology;
+        if ([accessString length] > 0)
+        {
+            return [self accessTypeForString:accessString];
+        }
+        else
+        {
+            return WWANTypeUnknown;
+        }
+    }
+    else
+    {
+        return WWANTypeUnknown;
+    }
+}
+
 #pragma mark - inner methods
 - (NSString *)paramValueFromStatus:(LocalConnectionStatus)status
 {
@@ -253,6 +290,26 @@ NSString *const kRealReachabilityChangedNotification = @"kRealReachabilityChange
         [strongSelf reachabilityWithBlock:nil];
         [strongSelf autoCheckReachability];
     });
+}
+
+- (WWANAccessType)accessTypeForString:(NSString *)accessString
+{
+    if ([self.typeStrings4G containsObject:accessString])
+    {
+        return WWANType4G;
+    }
+    else if ([self.typeStrings3G containsObject:accessString])
+    {
+        return WWANType3G;
+    }
+    else if ([self.typeStrings2G containsObject:accessString])
+    {
+        return WWANType2G;
+    }
+    else
+    {
+        return WWANTypeUnknown;
+    }
 }
 
 #pragma mark - Notification observer
