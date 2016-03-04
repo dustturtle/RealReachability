@@ -115,6 +115,10 @@ NSString *const kPingResultNotification = @"kPingResultNotification";
 
 - (void)endWithFlag:(BOOL)isSuccess
 {
+    // TODO(optimization):
+    //somewhere around here we should introduce a double check after 3 seconds on another host,
+    // if maybe not truely failed.
+    
     if (!self.isPinging)
     {
         return;
