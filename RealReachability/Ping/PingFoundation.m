@@ -593,17 +593,16 @@ static void HostResolveCallback(CFHostRef theHost, CFHostInfoType typeInfo, cons
     }
     else
     {
-        if (self->_host == NULL)
-        {
-            // host NULL; do nothing.
-            return;
-        }
-        
         Boolean             success;
         CFHostClientContext context = {0, (__bridge void *)(self), NULL, NULL, NULL};
         CFStreamError       streamError;
         
         self->_host = CFHostCreateWithName(NULL, (__bridge CFStringRef) self.hostName);
+        if (self->_host == NULL)
+        {
+            // host NULL; do nothing.
+            return;
+        }
         
         CFHostSetClient(self->_host, HostResolveCallback, &context);
         
