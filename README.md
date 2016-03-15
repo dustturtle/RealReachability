@@ -56,17 +56,25 @@ If you'd rather do everything by hand, just add the folder "RealReachability" to
 - The SystemConfiguration Framework should be added to your project.
 
 #Usage
-####Start to notify:
+####Start to notify(we suggest you to start notify in didFinishLaunchingWithOptions):
 
 ```objective-c
+
+- (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     [GLobalRealReachability startNotifier];
-    [[NSNotificationCenter defaultCenter] addObserver:self
+    return YES;
+}
+```
+####Add Observer(anywhere you like):
+```objective-c
+[[NSNotificationCenter defaultCenter] addObserver:self
                                              selector:@selector(networkChanged:)
                                                  name:kRealReachabilityChangedNotification
                                                object:nil];
 
 ```
-####Observer like below:
+
+####Observer method like below:
 ```objective-c
 - (void)networkChanged:(NSNotification *)notification
 {
@@ -117,6 +125,13 @@ You may set your own host any time you like. Codes just like below:
 ```
 GLobalRealReachability.hostForPing = @"www.baidu.com";
 ```
+
+#### Get current WWAN type (optional)
+```
+ WWANAccessType accessType = [GLobalRealReachability currentWWANtype];
+
+```
+Current WWAN type might be used to improve your app's user experience(e.g, set different network request timeout interval for different WWAN type).
 
 #Demo
 We already put the demo project in the [repository](https://github.com/dustturtle/RealReachability).
