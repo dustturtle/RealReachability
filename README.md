@@ -1,8 +1,8 @@
 # RealReachability
-[![Version](https://img.shields.io/badge/pod-1.1.1-yellow.svg)](http://cocoadocs.org/docsets/RealReachability/1.1.1/)
-[![License](https://img.shields.io/badge/License-MIT-blue.svg)](http://cocoadocs.org/docsets/RealReachability/1.1.1/)
-[![Platform](https://img.shields.io/badge/Platform-iOS-orange.svg)](http://cocoadocs.org/docsets/RealReachability/1.1.1/)
-[![Platform](https://img.shields.io/badge/Build-Passed-green.svg)](http://cocoadocs.org/docsets/RealReachability/1.1.1/)
+[![Version](https://img.shields.io/badge/pod-1.1.2-yellow.svg)](http://cocoadocs.org/docsets/RealReachability/1.1.2/)
+[![License](https://img.shields.io/badge/License-MIT-blue.svg)](http://cocoadocs.org/docsets/RealReachability/1.1.2/)
+[![Platform](https://img.shields.io/badge/Platform-iOS-orange.svg)](http://cocoadocs.org/docsets/RealReachability/1.1.2/)
+[![Platform](https://img.shields.io/badge/Build-Passed-green.svg)](http://cocoadocs.org/docsets/RealReachability/1.1.2/)
 ####We need to observe the REAL reachability of network for iOS. That's what RealReachability do.
 #Why RealReachability?
 As we know, we already have reachability framework for us to choose. Such as the famous repository [Reachability](https://github.com/tonymillion/Reachability).
@@ -36,7 +36,7 @@ To integrate RealReachability into your Xcode project using CocoaPods, specify i
 source 'https://github.com/CocoaPods/Specs.git'
 platform :ios, '6.0'
 
-pod 'RealReachability', '~> 1.1.1'
+pod 'RealReachability', '~> 1.1.2’
 ```
 
 Then, run the following command:
