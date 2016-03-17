@@ -27,6 +27,11 @@
                                                object:nil];
 }
 
+- (void)dealloc
+{
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
+}
+
 - (IBAction)testAction:(id)sender
 {
     [GLobalRealReachability reachabilityWithBlock:^(ReachabilityStatus status) {
