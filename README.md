@@ -146,3 +146,5 @@ Please use and improve! Patches accepted, or create an issue.
 
 I'd love it if you could send me a note as to which app you're using it with! Thank you!
 
+##[中文版使用指南](http://blog.csdn.net/openglnewbee/article/details/50705146)
+
