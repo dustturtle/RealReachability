@@ -25,6 +25,24 @@
                                              selector:@selector(networkChanged:)
                                                  name:kRealReachabilityChangedNotification
                                                object:nil];
+    
+    ReachabilityStatus status = [GLobalRealReachability currentReachabilityStatus];
+    NSLog(@"Initial reachability status:%@",@(status));
+    
+    if (status == RealStatusNotReachable)
+    {
+        self.flagLabel.text = @"Network unreachable!";
+    }
+    
+    if (status == RealStatusViaWiFi)
+    {
+        self.flagLabel.text = @"Network wifi! Free!";
+    }
+    
+    if (status == RealStatusViaWWAN)
+    {
+        self.flagLabel.text = @"Network WWAN! In charge!";
+    }
 }
 
 - (void)dealloc
@@ -84,7 +102,7 @@
 {
     RealReachability *reachability = (RealReachability *)notification.object;
     ReachabilityStatus status = [reachability currentReachabilityStatus];
-    NSLog(@"currentStatus:%@",@(status));
+    NSLog(@"networkChanged, currentStatus:%@",@(status));
     
     if (status == RealStatusNotReachable)
     {

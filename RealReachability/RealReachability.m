@@ -119,6 +119,10 @@ NSString *const kRealReachabilityChangedNotification = @"kRealReachabilityChange
                                              selector:@selector(localConnectionChanged:)
                                                  name:kLocalConnectionChangedNotification
                                                object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(localConnectionInitialized:)
+                                                 name:kLocalConnectionInitializedNotification
+                                               object:nil];
     
     GPingHelper.host = _hostForPing;
     [self autoCheckReachability];
@@ -126,6 +130,13 @@ NSString *const kRealReachabilityChangedNotification = @"kRealReachabilityChange
 
 - (void)stopNotifier
 {
+    [[NSNotificationCenter defaultCenter] removeObserver:self
+                                                    name:kLocalConnectionChangedNotification
+                                                  object:nil];
+    [[NSNotificationCenter defaultCenter] removeObserver:self
+                                                    name:kLocalConnectionInitializedNotification
+                                                  object:nil];
+    
     NSDictionary *inputDic = @{kEventKeyID:@(RREventUnLoad)};
     [self.engine receiveInput:inputDic];
     
@@ -339,9 +350,30 @@ NSString *const kRealReachabilityChangedNotification = @"kRealReachabilityChange
             // already in main thread.
             [[NSNotificationCenter defaultCenter] postNotificationName:kRealReachabilityChangedNotification
                                                                 object:self];
-            // To make sure your reachability is "Real".
-            [self reachabilityWithBlock:nil];
+            
+            if (lcStatus != LC_UnReachable)
+            {
+                // To make sure your reachability is "Real".
+                [self reachabilityWithBlock:nil];
+            }
         }
+    }
+}
+
+- (void)localConnectionInitialized:(NSNotification *)notification
+{
+    LocalConnection *lc = (LocalConnection *)notification.object;
+    LocalConnectionStatus lcStatus = [lc currentLocalConnectionStatus];
+    NSLog(@"localConnectionInitializedStatus:%@",@(lcStatus));
+    
+    NSDictionary *inputDic = @{kEventKeyID:@(RREventLocalConnectionCallback), kEventKeyParam:[self paramValueFromStatus:lcStatus]};
+    NSInteger rtn = [self.engine receiveInput:inputDic];
+    
+    // Initialized state, ping once to check the reachability(if local status reachable).
+    if ((rtn == 0) && [self.engine isCurrentStateAvailable] && (lcStatus != LC_UnReachable))
+    {
+        // To make sure your reachability is "Real".
+        [self reachabilityWithBlock:nil];
     }
 }
 
