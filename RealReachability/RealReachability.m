@@ -175,9 +175,11 @@ NSString *const kRealReachabilityChangedNotification = @"kRealReachabilityChange
              {
                  strongSelf.previousStatus = status;
                  // this makes sure the change notification happens on the MAIN THREAD
+                 __weak __typeof(strongSelf)deepWeakSelf = strongSelf;
                  dispatch_async(dispatch_get_main_queue(), ^{
+                     __strong __typeof(deepWeakSelf)deepStrongSelf = deepWeakSelf;
                      [[NSNotificationCenter defaultCenter] postNotificationName:kRealReachabilityChangedNotification
-                                                                         object:self];
+                                                                         object:deepStrongSelf];
                  });
              }
          }
