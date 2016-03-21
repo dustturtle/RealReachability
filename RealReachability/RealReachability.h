@@ -37,6 +37,7 @@ extern NSString *const kRealReachabilityChangedNotification;
 
 typedef NS_ENUM(NSInteger, ReachabilityStatus) {
     ///Direct match with Apple networkStatus, just a force type convert.
+    RealStatusUnknown = -1,
     RealStatusNotReachable = 0,
     RealStatusViaWWAN = 1,
     RealStatusViaWiFi = 2
@@ -77,6 +78,13 @@ typedef NS_ENUM(NSInteger, WWANAccessType) {
  *  @return see enum LocalConnectionStatus
  */
 - (ReachabilityStatus)currentReachabilityStatus;
+
+/**
+ *  Return previous reachability status.
+ *
+ *  @return see enum LocalConnectionStatus
+ */
+- (ReachabilityStatus)previousReachabilityStatus;
 
 /**
  *  Return current WWAN type immediately.

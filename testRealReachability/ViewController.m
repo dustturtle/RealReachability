@@ -102,7 +102,8 @@
 {
     RealReachability *reachability = (RealReachability *)notification.object;
     ReachabilityStatus status = [reachability currentReachabilityStatus];
-    NSLog(@"networkChanged, currentStatus:%@",@(status));
+    ReachabilityStatus previousStatus = [reachability previousReachabilityStatus];
+    NSLog(@"networkChanged, currentStatus:%@, previousStatus:%@", @(status), @(previousStatus));
     
     if (status == RealStatusNotReachable)
     {
@@ -140,6 +141,8 @@
             self.flagLabel.text = @"Unknown RealReachability WWAN Status, might be iOS6";
         }
     }
+    
+    
 }
 
 @end

@@ -29,6 +29,8 @@ NSString *const kRealReachabilityChangedNotification = @"kRealReachabilityChange
 @property (nonatomic,strong) NSArray *typeStrings4G;
 @property (nonatomic,strong) NSArray *typeStrings3G;
 @property (nonatomic,strong) NSArray *typeStrings2G;
+
+@property (nonatomic, assign) ReachabilityStatus previousStatus;
 @end
 
 @implementation RealReachability
@@ -110,6 +112,7 @@ NSString *const kRealReachabilityChangedNotification = @"kRealReachabilityChange
     }
     
     self.isNotifying = YES;
+    self.previousStatus = RealStatusUnknown;
     
     NSDictionary *inputDic = @{kEventKeyID:@(RREventLoad)};
     [self.engine receiveInput:inputDic];
@@ -159,6 +162,7 @@ NSString *const kRealReachabilityChangedNotification = @"kRealReachabilityChange
         return;
     }
     
+    ReachabilityStatus status = [self currentReachabilityStatus];
     __weak __typeof(self)weakSelf = self;
     [GPingHelper pingWithBlock:^(BOOL isSuccess)
      {
@@ -167,8 +171,9 @@ NSString *const kRealReachabilityChangedNotification = @"kRealReachabilityChange
          NSInteger rtn = [strongSelf.engine receiveInput:inputDic];
          if (rtn == 0) // state changed & state available, post notification.
          {
-             if ([self.engine isCurrentStateAvailable])
+             if ([strongSelf.engine isCurrentStateAvailable])
              {
+                 strongSelf.previousStatus = status;
                  // this makes sure the change notification happens on the MAIN THREAD
                  dispatch_async(dispatch_get_main_queue(), ^{
                      [[NSNotificationCenter defaultCenter] postNotificationName:kRealReachabilityChangedNotification
@@ -239,6 +244,11 @@ NSString *const kRealReachabilityChangedNotification = @"kRealReachabilityChange
             return RealStatusNotReachable;
         }
     }
+}
+
+- (ReachabilityStatus)previousReachabilityStatus
+{
+    return self.previousStatus;
 }
 
 - (void)setHostForPing:(NSString *)hostForPing
@@ -339,6 +349,7 @@ NSString *const kRealReachabilityChangedNotification = @"kRealReachabilityChange
     LocalConnection *lc = (LocalConnection *)notification.object;
     LocalConnectionStatus lcStatus = [lc currentLocalConnectionStatus];
     NSLog(@"currentLocalConnectionStatus:%@",@(lcStatus));
+    ReachabilityStatus status = [self currentReachabilityStatus];
     
     NSDictionary *inputDic = @{kEventKeyID:@(RREventLocalConnectionCallback), kEventKeyParam:[self paramValueFromStatus:lcStatus]};
     NSInteger rtn = [self.engine receiveInput:inputDic];
@@ -347,6 +358,7 @@ NSString *const kRealReachabilityChangedNotification = @"kRealReachabilityChange
     {
         if ([self.engine isCurrentStateAvailable])
         {
+            self.previousStatus = status;
             // already in main thread.
             [[NSNotificationCenter defaultCenter] postNotificationName:kRealReachabilityChangedNotification
                                                                 object:self];
