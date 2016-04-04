@@ -36,7 +36,7 @@ To integrate RealReachability into your Xcode project using CocoaPods, specify i
 source 'https://github.com/CocoaPods/Specs.git'
 platform :ios, '6.0'
 
-pod 'RealReachability', '~> 1.1.3’
+pod 'RealReachability', '~> 1.1.3'
 ```
 
 Then, run the following command:
