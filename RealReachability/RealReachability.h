@@ -55,7 +55,8 @@ typedef NS_ENUM(NSInteger, WWANAccessType) {
 /// Please make sure this host is available for pinging! default host:www.baidu.com
 @property (nonatomic, copy) NSString *hostForPing;
 
-/// Interval in minutes; default is 2.0f
+/// Interval in minutes; default is 2.0f, suggest value from 0.3f to 60.0f;
+/// If exceeded, the value will be reset to 0.3f or 60.0f (the closer one).
 @property (nonatomic, assign) float autoCheckInterval;
 
 + (instancetype)sharedInstance;

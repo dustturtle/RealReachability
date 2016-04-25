@@ -20,6 +20,9 @@
 #define kDefaultHost @"www.baidu.com"
 #define kDefaultCheckInterval 2.0f
 
+#define kMinAutoCheckInterval 0.3f
+#define kMaxAutoCheckInterval 60.0f
+
 NSString *const kRealReachabilityChangedNotification = @"kRealReachabilityChangedNotification";
 
 @interface RealReachability()
@@ -314,6 +317,16 @@ NSString *const kRealReachabilityChangedNotification = @"kRealReachabilityChange
     if (!self.isNotifying)
     {
         return;
+    }
+    
+    if (self.autoCheckInterval < kMinAutoCheckInterval)
+    {
+        self.autoCheckInterval = kMinAutoCheckInterval;
+    }
+    
+    if (self.autoCheckInterval > kMaxAutoCheckInterval)
+    {
+        self.autoCheckInterval = kMaxAutoCheckInterval;
     }
     
     dispatch_time_t time = dispatch_time(DISPATCH_TIME_NOW, self.autoCheckInterval*60*NSEC_PER_SEC);
