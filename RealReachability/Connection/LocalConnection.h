@@ -15,6 +15,10 @@
 /// then you should invoke currentLocalConnectionStatus method to fetch current status.
 extern NSString *const kLocalConnectionChangedNotification;
 
+/// After start observering, we post this notification once,
+/// you may invoke currentLocalConnectionStatus method to fetch initial status.
+extern NSString *const kLocalConnectionInitializedNotification;
+
 typedef NS_ENUM(NSInteger, LocalConnectionStatus)
 {
     LC_UnReachable = 0,

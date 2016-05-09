@@ -128,9 +128,14 @@ static uint16_t in_cksum(const void *buffer, size_t bufferLen)
 - (id)initWithHostName:(NSString *)hostName address:(NSData *)hostAddress
 // The initialiser common to both of our construction class methods.
 {
-    assert( (hostName != nil) == (hostAddress == nil) );
+    if ([hostName length] <= 0 && [hostAddress length] <= 0)
+    {
+        return nil;
+    }
+
     self = [super init];
-    if (self != nil) {
+    if (self != nil)
+    {
         self->_hostName    = [hostName copy];
         self->_hostAddress = [hostAddress copy];
         self->_identifier  = (uint16_t) arc4random();
@@ -142,8 +147,6 @@ static uint16_t in_cksum(const void *buffer, size_t bufferLen)
 {
     // -stop takes care of _host and _socket.
     [self stop];
-    assert(self->_host == NULL);
-    assert(self->_socket == NULL);
 }
 
 + (PingFoundation *)pingFoundationWithHostName:(NSString *)hostName
@@ -155,7 +158,7 @@ static uint16_t in_cksum(const void *buffer, size_t bufferLen)
 + (PingFoundation *)pingFoundationWithHostAddress:(NSData *)hostAddress
 // See comment in header.
 {
-    return [[PingFoundation alloc] initWithHostName:NULL address:hostAddress];
+    return [[PingFoundation alloc] initWithHostName:nil address:hostAddress];
 }
 
 - (void)noop
@@ -165,8 +168,6 @@ static uint16_t in_cksum(const void *buffer, size_t bufferLen)
 - (void)didFailWithError:(NSError *)error
 // Shut down the pinger object and tell the delegate about the error.
 {
-    assert(error != nil);
-    
     // We retain ourselves temporarily because it's common for the delegate method
     // to release its last reference to use, which causes -dealloc to be called here.
     // If we then reference self on the return path, things go badly.  I don't think
@@ -198,7 +199,6 @@ static uint16_t in_cksum(const void *buffer, size_t bufferLen)
         userInfo = nil;
     }
     error = [NSError errorWithDomain:(NSString *)kCFErrorDomainCFNetwork code:kCFHostErrorUnknown userInfo:userInfo];
-    assert(error != nil);
     
     [self didFailWithError:error];
 }
@@ -215,15 +215,13 @@ static uint16_t in_cksum(const void *buffer, size_t bufferLen)
     // Construct the ping packet.
     
     payload = data;
-    if (payload == nil) {
+    if (payload == nil)
+    {
+        // payload lenth here should be 56.
         payload = [[NSString stringWithFormat:@"%28zd bottles of beer on the wall", (ssize_t) 99 - (size_t) (self.nextSequenceNumber % 100) ] dataUsingEncoding:NSASCIIStringEncoding];
-        assert(payload != nil);
-        
-        assert([payload length] == 56);
     }
     
     packet = [NSMutableData dataWithLength:sizeof(*icmpPtr) + [payload length]];
-    assert(packet != nil);
     
     icmpPtr = [packet mutableBytes];
     icmpPtr->type = kICMPTypeEchoRequest;
@@ -261,23 +259,27 @@ static uint16_t in_cksum(const void *buffer, size_t bufferLen)
     
     // Handle the results of the send.
     
-    if ( (bytesSent > 0) && (((NSUInteger) bytesSent) == [packet length]) ) {
-        
+    if ( (bytesSent > 0) && (((NSUInteger) bytesSent) == [packet length]) )
+    {
         // Complete success.  Tell the client.
-        
-        if ( (self.delegate != nil) && [self.delegate respondsToSelector:@selector(pingFoundation:didSendPacket:)] ) {
+        if ( (self.delegate != nil) && [self.delegate respondsToSelector:@selector(pingFoundation:didSendPacket:)] )
+        {
             [self.delegate pingFoundation:self didSendPacket:packet];
         }
-    } else {
+    }
+    else
+    {
         NSError *   error;
         
         // Some sort of failure.  Tell the client.
         
-        if (err == 0) {
+        if (err == 0)
+        {
             err = ENOBUFS;          // This is not a hugely descriptor error, alas.
         }
         error = [NSError errorWithDomain:NSPOSIXErrorDomain code:err userInfo:nil];
-        if ( (self.delegate != nil) && [self.delegate respondsToSelector:@selector(pingFoundation:didFailToSendPacket:error:)] ) {
+        if ( (self.delegate != nil) && [self.delegate respondsToSelector:@selector(pingFoundation:didFailToSendPacket:error:)] )
+        {
             [self.delegate pingFoundation:self didFailToSendPacket:packet error:error];
         }
     }
@@ -295,8 +297,8 @@ static uint16_t in_cksum(const void *buffer, size_t bufferLen)
     result = NSNotFound;
     if ([packet length] >= (sizeof(IPHeader) + sizeof(ICMPHeader))) {
         ipPtr = (const IPHeader *) [packet bytes];
-        assert((ipPtr->versionAndHeaderLength & 0xF0) == 0x40);     // IPv4
-        assert(ipPtr->protocol == 1);                               // ICMP
+        //assert((ipPtr->versionAndHeaderLength & 0xF0) == 0x40);     // IPv4
+        //assert(ipPtr->protocol == 1);                               // ICMP
         ipHeaderLength = (ipPtr->versionAndHeaderLength & 0x0F) * sizeof(uint32_t);
         if ([packet length] >= (ipHeaderLength + sizeof(ICMPHeader))) {
             result = ipHeaderLength;
@@ -369,7 +371,6 @@ static uint16_t in_cksum(const void *buffer, size_t bufferLen)
     // here (plus it's what <x-man-page://8/ping> uses).
     
     buffer = malloc(kBufferSize);
-    assert(buffer != NULL);
     
     // Actually read the data.
     
@@ -387,8 +388,7 @@ static uint16_t in_cksum(const void *buffer, size_t bufferLen)
     {
         NSMutableData * packet;
         
-        packet = [NSMutableData dataWithBytes:buffer length:(NSUInteger) bytesRead];
-        assert(packet != nil);
+        packet = [NSMutableData dataWithBytes:buffer length:(NSUInteger)bytesRead];
         
         // We got some data, pass it up to our client.
         
@@ -409,7 +409,6 @@ static uint16_t in_cksum(const void *buffer, size_t bufferLen)
     }
     else
     {
-        
         // We failed to read the data, so shut everything down.
         
         if (err == 0)
@@ -430,30 +429,32 @@ static void SocketReadCallback(CFSocketRef s, CFSocketCallBackType type, CFDataR
 // ICMP socket.  It just redirects the call to Objective-C code.
 {
     PingFoundation *    obj;
-    
     obj = (__bridge PingFoundation *) info;
-    assert([obj isKindOfClass:[PingFoundation class]]);
     
-#pragma unused(s)
-    assert(s == obj->_socket);
-#pragma unused(type)
-    assert(type == kCFSocketReadCallBack);
-#pragma unused(address)
-    assert(address == nil);
-#pragma unused(data)
-    assert(data == nil);
-    
-    [obj readData];
+    if (([obj isKindOfClass:[PingFoundation class]] && type == kCFSocketReadCallBack))
+    {
+        if (s == obj->_socket)
+        {
+            [obj readData];
+        }
+        else
+        {
+            // unmatched, do nothing.
+        }
+    }
 }
 
 - (void)startWithHostAddress
 // We have a host address, so let's actually start pinging it.
 {
+    if (self.hostAddress == nil)
+    {
+        return;
+    }
+    
     int                     err;
     int                     fd;
     const struct sockaddr * addrPtr;
-    
-    assert(self.hostAddress != nil);
     
     // Open the socket.
     
@@ -473,7 +474,6 @@ static void SocketReadCallback(CFSocketRef s, CFSocketCallBackType type, CFDataR
         }
             break;
         case AF_INET6:
-            assert(NO);
             // fall through
         default:
         {
@@ -494,15 +494,11 @@ static void SocketReadCallback(CFSocketRef s, CFSocketCallBackType type, CFDataR
         // Wrap it in a CFSocket and schedule it on the runloop.
         
         self->_socket = CFSocketCreateWithNative(NULL, fd, kCFSocketReadCallBack, SocketReadCallback, &context);
-        assert(self->_socket != NULL);
         
         // The socket will now take care of cleaning up our file descriptor.
-        
-        assert( CFSocketGetSocketFlags(self->_socket) & kCFSocketCloseOnInvalidate );
         fd = -1;
         
         rls = CFSocketCreateRunLoopSource(NULL, self->_socket, 0);
-        assert(rls != NULL);
         
         CFRunLoopAddSource(CFRunLoopGetCurrent(), rls, kCFRunLoopDefaultMode);
         
@@ -513,7 +509,6 @@ static void SocketReadCallback(CFSocketRef s, CFSocketCallBackType type, CFDataR
             [self.delegate pingFoundation:self didStartWithAddress:self.hostAddress];
         }
     }
-    assert(fd == -1);
 }
 
 - (void)hostResolutionDone
@@ -565,24 +560,24 @@ static void HostResolveCallback(CFHostRef theHost, CFHostInfoType typeInfo, cons
 // It just redirects the call to the appropriate Objective-C method.
 {
     PingFoundation *    obj;
-    
-    //NSLog(@">HostResolveCallback");
-    
     obj = (__bridge PingFoundation *) info;
-    assert([obj isKindOfClass:[PingFoundation class]]);
     
-#pragma unused(theHost)
-    assert(theHost == obj->_host);
-#pragma unused(typeInfo)
-    assert(typeInfo == kCFHostAddresses);
-    
-    if ( (error != NULL) && (error->domain != 0) )
+    if (([obj isKindOfClass:[PingFoundation class]] && typeInfo == kCFHostAddresses))
     {
-        [obj didFailWithHostStreamError:*error];
-    }
-    else
-    {
-        [obj hostResolutionDone];
+        if (theHost != obj->_host)
+        {
+            // unmatched, do nothing.
+            return;
+        }
+        
+        if ((error != NULL) && (error->domain != 0))
+        {
+            [obj didFailWithHostStreamError:*error];
+        }
+        else
+        {
+            [obj hostResolutionDone];
+        }
     }
 }
 
@@ -602,16 +597,17 @@ static void HostResolveCallback(CFHostRef theHost, CFHostInfoType typeInfo, cons
         CFHostClientContext context = {0, (__bridge void *)(self), NULL, NULL, NULL};
         CFStreamError       streamError;
         
-        //assert(self->_host == NULL);
-        
         self->_host = CFHostCreateWithName(NULL, (__bridge CFStringRef) self.hostName);
-        //assert(self->_host != NULL);
+        if (self->_host == NULL)
+        {
+            // host NULL; do nothing.
+            return;
+        }
         
         CFHostSetClient(self->_host, HostResolveCallback, &context);
         
         CFHostScheduleWithRunLoop(self->_host, CFRunLoopGetCurrent(), kCFRunLoopDefaultMode);
         
-        //NSLog(@">CFHostStartInfoResolution");
         success = CFHostStartInfoResolution(self->_host, kCFHostAddresses, &streamError);
         //NSLog(@"<CFHostStartInfoResolution");
         if ( ! success )

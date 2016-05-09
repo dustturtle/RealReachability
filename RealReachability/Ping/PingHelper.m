@@ -75,14 +75,13 @@ NSString *const kPingResultNotification = @"kPingResultNotification";
     
     if (!self.isPinging)
     {
-        // safe protection for exceptional situation, background app or multi-thread, eg.
-        [self.pingFoundation stop];
-        
         // MUST make sure pingFoundation in mainThread
         __weak __typeof(self)weakSelf = self;
         if (![[NSThread currentThread] isMainThread]) {
             dispatch_sync(dispatch_get_main_queue(), ^{
                 __strong __typeof(weakSelf)strongSelf = weakSelf;
+                // safe protection for exceptional situation, background app or multi-thread, eg.
+                [strongSelf.pingFoundation stop];
                 strongSelf.isPinging = YES;
                 [strongSelf.pingFoundation start];
                 
@@ -91,6 +90,8 @@ NSString *const kPingResultNotification = @"kPingResultNotification";
         }
         else
         {
+            // safe protection for exceptional situation, background app or multi-thread, eg.
+            [self.pingFoundation stop];
             self.isPinging = YES;
             [self.pingFoundation start];
             

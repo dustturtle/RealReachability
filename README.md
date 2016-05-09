@@ -1,8 +1,8 @@
 # RealReachability
-[![Version](https://img.shields.io/badge/pod-1.1.1-yellow.svg)](http://cocoadocs.org/docsets/RealReachability/1.1.1/)
-[![License](https://img.shields.io/badge/License-MIT-blue.svg)](http://cocoadocs.org/docsets/RealReachability/1.1.1/)
-[![Platform](https://img.shields.io/badge/Platform-iOS-orange.svg)](http://cocoadocs.org/docsets/RealReachability/1.1.1/)
-[![Platform](https://img.shields.io/badge/Build-Passed-green.svg)](http://cocoadocs.org/docsets/RealReachability/1.1.1/)
+[![Version](https://img.shields.io/badge/pod-1.1.3-yellow.svg)](http://cocoadocs.org/docsets/RealReachability/1.1.3/)
+[![License](https://img.shields.io/badge/License-MIT-blue.svg)](http://cocoadocs.org/docsets/RealReachability/1.1.3/)
+[![Platform](https://img.shields.io/badge/Platform-iOS-orange.svg)](http://cocoadocs.org/docsets/RealReachability/1.1.3/)
+[![Platform](https://img.shields.io/badge/Build-Passed-green.svg)](http://cocoadocs.org/docsets/RealReachability/1.1.3/)
 ####We need to observe the REAL reachability of network for iOS. That's what RealReachability do.
 #Why RealReachability?
 As we know, we already have reachability framework for us to choose. Such as the famous repository [Reachability](https://github.com/tonymillion/Reachability).
@@ -36,7 +36,7 @@ To integrate RealReachability into your Xcode project using CocoaPods, specify i
 source 'https://github.com/CocoaPods/Specs.git'
 platform :ios, '6.0'
 
-pod 'RealReachability', '~> 1.1.1'
+pod 'RealReachability', '~> 1.1.3'
 ```
 
 Then, run the following command:
@@ -56,17 +56,25 @@ If you'd rather do everything by hand, just add the folder "RealReachability" to
 - The SystemConfiguration Framework should be added to your project.
 
 #Usage
-####Start to notify:
+####Start to notify(we suggest you to start notify in didFinishLaunchingWithOptions):
 
 ```objective-c
+
+- (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     [GLobalRealReachability startNotifier];
-    [[NSNotificationCenter defaultCenter] addObserver:self
+    return YES;
+}
+```
+####Add Observer(anywhere you like):
+```objective-c
+[[NSNotificationCenter defaultCenter] addObserver:self
                                              selector:@selector(networkChanged:)
                                                  name:kRealReachabilityChangedNotification
                                                object:nil];
 
 ```
-####Observer like below:
+
+####Observer method like below:
 ```objective-c
 - (void)networkChanged:(NSNotification *)notification
 {
@@ -118,6 +126,13 @@ You may set your own host any time you like. Codes just like below:
 GLobalRealReachability.hostForPing = @"www.baidu.com";
 ```
 
+#### Get current WWAN type (optional)
+```
+ WWANAccessType accessType = [GLobalRealReachability currentWWANtype];
+
+```
+Current WWAN type might be used to improve your app's user experience(e.g, set different network request timeout interval for different WWAN type).
+
 #Demo
 We already put the demo project in the [repository](https://github.com/dustturtle/RealReachability).
 
@@ -130,4 +145,6 @@ RealReachability is released under the MIT license. See LICENSE for details.
 Please use and improve! Patches accepted, or create an issue.
 
 I'd love it if you could send me a note as to which app you're using it with! Thank you!
+
+##[中文版使用指南](http://blog.csdn.net/openglnewbee/article/details/50705146)
 

@@ -12,6 +12,7 @@
 #define NSLog(...)
 #endif
 
+NSString *const kLocalConnectionInitializedNotification = @"kLocalConnectionInitializedNotification";
 NSString *const kLocalConnectionChangedNotification = @"kLocalConnectionChangedNotification";
 
 @interface LocalConnection ()
@@ -113,9 +114,14 @@ static NSString *connectionFlags(SCNetworkReachabilityFlags flags)
     {
         NSLog(@"SCNetworkReachabilitySetCallback() failed: %s", SCErrorString(SCError()));
     }
-    
-    // First time we come in, notify the current status.
-    [self localConnectionChanged];
+
+    // First time we come in, notify the initialization of local connection.
+    __weak __typeof(self)weakSelf = self;
+    dispatch_async(dispatch_get_main_queue(), ^{
+        __strong __typeof(weakSelf)strongSelf = weakSelf;
+        [[NSNotificationCenter defaultCenter] postNotificationName:kLocalConnectionInitializedNotification
+                                                            object:strongSelf];
+    });
 }
 
 -(void)stopNotifier
@@ -152,9 +158,11 @@ static NSString *connectionFlags(SCNetworkReachabilityFlags flags)
 - (void)localConnectionChanged
 {
     // this makes sure the change notification happens on the MAIN THREAD
+    __weak __typeof(self)weakSelf = self;
     dispatch_async(dispatch_get_main_queue(), ^{
+        __strong __typeof(weakSelf)strongSelf = weakSelf;
         [[NSNotificationCenter defaultCenter] postNotificationName:kLocalConnectionChangedNotification
-                                                            object:self];
+                                                            object:strongSelf];
     });
 }
 

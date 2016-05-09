@@ -20,20 +20,34 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
-    // Do any additional setup after loading the view, typically from a nib.
-
     
-    [GLobalRealReachability startNotifier];
     [[NSNotificationCenter defaultCenter] addObserver:self
                                              selector:@selector(networkChanged:)
                                                  name:kRealReachabilityChangedNotification
                                                object:nil];
+    
+    ReachabilityStatus status = [GLobalRealReachability currentReachabilityStatus];
+    NSLog(@"Initial reachability status:%@",@(status));
+    
+    if (status == RealStatusNotReachable)
+    {
+        self.flagLabel.text = @"Network unreachable!";
+    }
+    
+    if (status == RealStatusViaWiFi)
+    {
+        self.flagLabel.text = @"Network wifi! Free!";
+    }
+    
+    if (status == RealStatusViaWWAN)
+    {
+        self.flagLabel.text = @"Network WWAN! In charge!";
+    }
 }
 
-- (void)didReceiveMemoryWarning
+- (void)dealloc
 {
-    [super didReceiveMemoryWarning];
-    // Dispose of any resources that can be recreated.
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 
 - (IBAction)testAction:(id)sender
@@ -88,7 +102,8 @@
 {
     RealReachability *reachability = (RealReachability *)notification.object;
     ReachabilityStatus status = [reachability currentReachabilityStatus];
-    NSLog(@"currentStatus:%@",@(status));
+    ReachabilityStatus previousStatus = [reachability previousReachabilityStatus];
+    NSLog(@"networkChanged, currentStatus:%@, previousStatus:%@", @(status), @(previousStatus));
     
     if (status == RealStatusNotReachable)
     {
@@ -126,6 +141,8 @@
             self.flagLabel.text = @"Unknown RealReachability WWAN Status, might be iOS6";
         }
     }
+    
+    
 }
 
 @end
