@@ -4,6 +4,11 @@
 [![Platform](https://img.shields.io/badge/Platform-iOS-orange.svg)](http://cocoadocs.org/docsets/RealReachability/1.1.3/)
 [![Platform](https://img.shields.io/badge/Build-Passed-green.svg)](http://cocoadocs.org/docsets/RealReachability/1.1.3/)
 ####We need to observe the REAL reachability of network for iOS. That's what RealReachability do.
+
+
+#####[NEWS FROM APPLE](https://developer.apple.com/news/?id=05042016a): Starting June 1, 2016 all apps submitted to the App Store MUST support IPv6-only networking.
+### RealReachability SUPPORT IPV6 NOW. PLEASE UPDATE TO THE MASTER VERSION!!!  
+###Found any issue around IPV6, contact me as soon as possible, Thank you! Pod version will be updated later.
 #Why RealReachability?
 As we know, we already have reachability framework for us to choose. Such as the famous repository [Reachability](https://github.com/tonymillion/Reachability).
 
