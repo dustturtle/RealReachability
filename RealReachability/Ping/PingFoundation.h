@@ -1,54 +1,50 @@
 /*
- File:       PingFoundation.h
+ Copyright (C) 2016 Apple Inc. All Rights Reserved.
+ LICENSE:
+ IMPORTANT:  This Apple software is supplied to you by Apple
+ Inc. ("Apple") in consideration of your agreement to the following
+ terms, and your use, installation, modification or redistribution of
+ this Apple software constitutes acceptance of these terms.  If you do
+ not agree with these terms, please do not use, install, modify or
+ redistribute this Apple software.
  
- Contains:   Implements ping.
+ In consideration of your agreement to abide by the following terms, and
+ subject to these terms, Apple grants you a personal, non-exclusive
+ license, under Apple's copyrights in this original Apple software (the
+ "Apple Software"), to use, reproduce, modify and redistribute the Apple
+ Software, with or without modifications, in source and/or binary forms;
+ provided that if you redistribute the Apple Software in its entirety and
+ without modifications, you must retain this notice and the following
+ text and disclaimers in all such redistributions of the Apple Software.
+ Neither the name, trademarks, service marks or logos of Apple Inc. may
+ be used to endorse or promote products derived from the Apple Software
+ without specific prior written permission from Apple.  Except as
+ expressly stated in this notice, no other rights or licenses, express or
+ implied, are granted by Apple herein, including but not limited to any
+ patent rights that may be infringed by your derivative works or by other
+ works in which the Apple Software may be incorporated.
  
- Written by: DTS
+ The Apple Software is provided by Apple on an "AS IS" basis.  APPLE
+ MAKES NO WARRANTIES, EXPRESS OR IMPLIED, INCLUDING WITHOUT LIMITATION
+ THE IMPLIED WARRANTIES OF NON-INFRINGEMENT, MERCHANTABILITY AND FITNESS
+ FOR A PARTICULAR PURPOSE, REGARDING THE APPLE SOFTWARE OR ITS USE AND
+ OPERATION ALONE OR IN COMBINATION WITH YOUR PRODUCTS.
  
- Copyright:  Copyright (c) 2010-2012 Apple Inc. All Rights Reserved.
+ IN NO EVENT SHALL APPLE BE LIABLE FOR ANY SPECIAL, INDIRECT, INCIDENTAL
+ OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ INTERRUPTION) ARISING IN ANY WAY OUT OF THE USE, REPRODUCTION,
+ MODIFICATION AND/OR DISTRIBUTION OF THE APPLE SOFTWARE, HOWEVER CAUSED
+ AND WHETHER UNDER THEORY OF CONTRACT, TORT (INCLUDING NEGLIGENCE),
+ STRICT LIABILITY OR OTHERWISE, EVEN IF APPLE HAS BEEN ADVISED OF THE
+ POSSIBILITY OF SUCH DAMAGE.
  
- Disclaimer: IMPORTANT: This Apple software is supplied to you by Apple Inc.
- ("Apple") in consideration of your agreement to the following
- terms, and your use, installation, modification or
- redistribution of this Apple software constitutes acceptance of
- these terms.  If you do not agree with these terms, please do
- not use, install, modify or redistribute this Apple software.
+ Copyright (C) 2016 Apple Inc. All Rights Reserved.
  
- In consideration of your agreement to abide by the following
- terms, and subject to these terms, Apple grants you a personal,
- non-exclusive license, under Apple's copyrights in this
- original Apple software (the "Apple Software"), to use,
- reproduce, modify and redistribute the Apple Software, with or
- without modifications, in source and/or binary forms; provided
- that if you redistribute the Apple Software in its entirety and
- without modifications, you must retain this notice and the
- following text and disclaimers in all such redistributions of
- the Apple Software. Neither the name, trademarks, service marks
- or logos of Apple Inc. may be used to endorse or promote
- products derived from the Apple Software without specific prior
- written permission from Apple.  Except as expressly stated in
- this notice, no other rights or licenses, express or implied,
- are granted by Apple herein, including but not limited to any
- patent rights that may be infringed by your derivative works or
- by other works in which the Apple Software may be incorporated.
+ Abstract:
+ An object wrapper around the low-level BSD Sockets ping function.
  
- The Apple Software is provided by Apple on an "AS IS" basis.
- APPLE MAKES NO WARRANTIES, EXPRESS OR IMPLIED, INCLUDING
- WITHOUT LIMITATION THE IMPLIED WARRANTIES OF NON-INFRINGEMENT,
- MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE, REGARDING
- THE APPLE SOFTWARE OR ITS USE AND OPERATION ALONE OR IN
- COMBINATION WITH YOUR PRODUCTS.
- 
- IN NO EVENT SHALL APPLE BE LIABLE FOR ANY SPECIAL, INDIRECT,
- INCIDENTAL OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED
- TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
- DATA, OR PROFITS; OR BUSINESS INTERRUPTION) ARISING IN ANY WAY
- OUT OF THE USE, REPRODUCTION, MODIFICATION AND/OR DISTRIBUTION
- OF THE APPLE SOFTWARE, HOWEVER CAUSED AND WHETHER UNDER THEORY
- OF CONTRACT, TORT (INCLUDING NEGLIGENCE), STRICT LIABILITY OR
- OTHERWISE, EVEN IF APPLE HAS BEEN ADVISED OF THE POSSIBILITY OF
- SUCH DAMAGE.
- 
+ Modified by dustturtle:openglnewbee@163.com, follow the license below.
  */
 
 #import <Foundation/Foundation.h>
@@ -67,17 +63,70 @@
 
 @protocol PingFoundationDelegate;
 
+typedef NS_ENUM(NSInteger, PingFoundationAddressStyle) {
+    PingFoundationAddressStyleAny,          ///< Use the first IPv4 or IPv6 address found; the default.
+    PingFoundationAddressStyleICMPv4,       ///< Use the first IPv4 address found.
+    PingFoundationAddressStyleICMPv6        ///< Use the first IPv6 address found.
+};
+
 @interface PingFoundation : NSObject
 
-+ (PingFoundation *)pingFoundationWithHostName:(NSString *)hostName;        // chooses first IPv4 address
-+ (PingFoundation *)pingFoundationWithHostAddress:(NSData *)hostAddress;    // contains (struct sockaddr)
+- (instancetype)init NS_UNAVAILABLE;
 
-@property (nonatomic, assign, readwrite) id<PingFoundationDelegate> delegate;
+/*! Initialise the object to ping the specified host.
+ *  \param hostName The DNS name of the host to ping; an IPv4 or IPv6 address in string form will
+ *      work here.
+ *  \returns The initialised object.
+ */
 
-@property (nonatomic, copy,   readonly) NSString *             hostName;
-@property (nonatomic, copy,   readonly) NSData *               hostAddress;
-@property (nonatomic, assign, readonly) uint16_t               identifier;
-@property (nonatomic, assign, readonly) uint16_t               nextSequenceNumber;
+- (instancetype)initWithHostName:(NSString *)hostName NS_DESIGNATED_INITIALIZER;
+
+/*! A copy of the value passed to `-initWithHostName:`.
+ */
+
+@property (nonatomic, copy, readonly) NSString * hostName;
+
+/*! The delegate for this object.
+ *  \details Delegate callbacks are schedule in the default run loop mode of the run loop of the
+ *      thread that calls `-start`.
+ */
+
+@property (nonatomic, weak, readwrite) id<PingFoundationDelegate> delegate;
+
+/*! Controls the IP address version used by the object.
+ *  \details You should set this value before starting the object.
+ */
+
+@property (nonatomic, assign, readwrite) PingFoundationAddressStyle addressStyle;
+
+/*! The address being pinged.
+ *  \details The contents of the NSData is a (struct sockaddr) of some form.  The
+ *      value is nil while the object is stopped and remains nil on start until
+ *      `-pingFoundation:didStartWithAddress:` is called.
+ */
+
+@property (nonatomic, copy, readonly) NSData * hostAddress;
+
+/*! The address family for `hostAddress`, or `AF_UNSPEC` if that's nil.
+ */
+
+@property (nonatomic, assign, readonly) sa_family_t hostAddressFamily;
+
+/*! The identifier used by pings by this object.
+ *  \details When you create an instance of this object it generates a random identifier
+ *      that it uses to identify its own pings.
+ */
+
+@property (nonatomic, assign, readonly) uint16_t identifier;
+
+/*! The next sequence number to be used by this object.
+ *  \details This value starts at zero and increments each time you send a ping (safely
+ *      wrapping back to zero if necessary).  The sequence number is included in the ping,
+ *      allowing you to match up requests and responses, and thus calculate ping times and
+ *      so on.
+ */
+
+@property (nonatomic, assign, readonly) uint16_t nextSequenceNumber;
 
 - (void)start;
 // Starts the pinger object pinging.  You should call this after
@@ -105,77 +154,117 @@
 
 @optional
 
+/*! A PingFoundation delegate callback, called once the object has started up.
+ *  \details This is called shortly after you start the object to tell you that the
+ *      object has successfully started.  On receiving this callback, you can call
+ *      `-sendPingWithData:` to send pings.
+ *
+ *      If the object didn't start, `-pingFoundation:didFailWithError:` is called instead.
+ *  \param pinger The object issuing the callback.
+ *  \param address The address that's being pinged; at the time this delegate callback
+ *      is made, this will have the same value as the `hostAddress` property.
+ */
+
 - (void)pingFoundation:(PingFoundation *)pinger didStartWithAddress:(NSData *)address;
-// Called after the PingFoundation has successfully started up.  After this callback, you
-// can start sending pings via -sendPingWithData:
+
+/*! A PingFoundation delegate callback, called if the object fails to start up.
+ *  \details This is called shortly after you start the object to tell you that the
+ *      object has failed to start.  The most likely cause of failure is a problem
+ *      resolving `hostName`.
+ *
+ *      By the time this callback is called, the object has stopped (that is, you don't
+ *      need to call `-stop` yourself).
+ *  \param pinger The object issuing the callback.
+ *  \param error Describes the failure.
+ */
 
 - (void)pingFoundation:(PingFoundation *)pinger didFailWithError:(NSError *)error;
-// If this is called, the PingFoundation object has failed.  By the time this callback is
-// called, the object has stopped (that is, you don't need to call -stop yourself).
 
-// IMPORTANT: On the send side the packet does not include an IP header.
-// On the receive side, it does.  In that case, use +[PingFoundation icmpInPacket:]
-// to find the ICMP header within the packet.
+/*! A PingFoundation delegate callback, called when the object has successfully sent a ping packet.
+ *  \details Each call to `-sendPingWithData:` will result in either a
+ *      `-pingFoundation:didSendPacket:sequenceNumber:` delegate callback or a
+ *      `-pingFoundation:didFailToSendPacket:sequenceNumber:error:` delegate callback (unless you
+ *      stop the object before you get the callback).  These callbacks are currently delivered
+ *      synchronously from within `-sendPingWithData:`, but this synchronous behaviour is not
+ *      considered API.
+ *  \param pinger The object issuing the callback.
+ *  \param packet The packet that was sent; this includes the ICMP header (`ICMPHeader`) and the
+ *      data you passed to `-sendPingWithData:` but does not include any IP-level headers.
+ *  \param sequenceNumber The ICMP sequence number of that packet.
+ */
 
-- (void)pingFoundation:(PingFoundation *)pinger didSendPacket:(NSData *)packet;
-// Called whenever the PingFoundation object has successfully sent a ping packet.
+- (void)pingFoundation:(PingFoundation *)pinger didSendPacket:(NSData *)packet sequenceNumber:(uint16_t)sequenceNumber;
 
-- (void)pingFoundation:(PingFoundation *)pinger didFailToSendPacket:(NSData *)packet error:(NSError *)error;
-// Called whenever the PingFoundation object tries and fails to send a ping packet.
+/*! A PingFoundation delegate callback, called when the object fails to send a ping packet.
+ *  \details Each call to `-sendPingWithData:` will result in either a
+ *      `-pingFoundation:didSendPacket:sequenceNumber:` delegate callback or a
+ *      `-pingFoundation:didFailToSendPacket:sequenceNumber:error:` delegate callback (unless you
+ *      stop the object before you get the callback).  These callbacks are currently delivered
+ *      synchronously from within `-sendPingWithData:`, but this synchronous behaviour is not
+ *      considered API.
+ *  \param pinger The object issuing the callback.
+ *  \param packet The packet that was not sent; see `-pingFoundation:didSendPacket:sequenceNumber:`
+ *      for details.
+ *  \param sequenceNumber The ICMP sequence number of that packet.
+ *  \param error Describes the failure.
+ */
 
-- (void)pingFoundation:(PingFoundation *)pinger didReceivePingResponsePacket:(NSData *)packet;
-// Called whenever the PingFoundation object receives an ICMP packet that looks like
-// a response to one of our pings (that is, has a valid ICMP checksum, has
-// an identifier that matches our identifier, and has a sequence number in
-// the range of sequence numbers that we've sent out).
+- (void)pingFoundation:(PingFoundation *)pinger didFailToSendPacket:(NSData *)packet sequenceNumber:(uint16_t)sequenceNumber error:(NSError *)error;
+
+/*! A PingFoundation delegate callback, called when the object receives a ping response.
+ *  \details If the object receives an ping response that matches a ping request that it
+ *      sent, it informs the delegate via this callback.  Matching is primarily done based on
+ *      the ICMP identifier, although other criteria are used as well.
+ *  \param pinger The object issuing the callback.
+ *  \param packet The packet received; this includes the ICMP header (`ICMPHeader`) and any data that
+ *      follows that in the ICMP message but does not include any IP-level headers.
+ *  \param sequenceNumber The ICMP sequence number of that packet.
+ */
+
+- (void)pingFoundation:(PingFoundation *)pinger didReceivePingResponsePacket:(NSData *)packet sequenceNumber:(uint16_t)sequenceNumber;
+
+/*! A PingFoundation delegate callback, called when the object receives an unmatched ICMP message.
+ *  \details If the object receives an ICMP message that does not match a ping request that it
+ *      sent, it informs the delegate via this callback.  The nature of ICMP handling in a
+ *      BSD kernel makes this a common event because, when an ICMP message arrives, it is
+ *      delivered to all ICMP sockets.
+ *
+ *      IMPORTANT: This callback is especially common when using IPv6 because IPv6 uses ICMP
+ *      for important network management functions.  For example, IPv6 routers periodically
+ *      send out Router Advertisement (RA) packets via Neighbor Discovery Protocol (NDP), which
+ *      is implemented on top of ICMP.
+ *
+ *      For more on matching, see the discussion associated with
+ *      `-pingFoundation:didReceivePingResponsePacket:sequenceNumber:`.
+ *  \param pinger The object issuing the callback.
+ *  \param packet The packet received; this includes the ICMP header (`ICMPHeader`) and any data that
+ *      follows that in the ICMP message but does not include any IP-level headers.
+ */
 
 - (void)pingFoundation:(PingFoundation *)pinger didReceiveUnexpectedPacket:(NSData *)packet;
-// Called whenever the PingFoundation object receives an ICMP packet that does not
-// look like a response to one of our pings.
 
 @end
 
 #pragma mark * IP and ICMP On-The-Wire Format
 
-// The following declarations specify the structure of ping packets on the wire.
-
-// IP header structure:
-
-struct IPHeader
-{
-    uint8_t     versionAndHeaderLength;
-    uint8_t     differentiatedServices;
-    uint16_t    totalLength;
-    uint16_t    identification;
-    uint16_t    flagsAndFragmentOffset;
-    uint8_t     timeToLive;
-    uint8_t     protocol;
-    uint16_t    headerChecksum;
-    uint8_t     sourceAddress[4];
-    uint8_t     destinationAddress[4];
-    // options...
-    // data...
-};
-typedef struct IPHeader IPHeader;
-
-check_compile_time(sizeof(IPHeader) == 20);
-check_compile_time(offsetof(IPHeader, versionAndHeaderLength) == 0);
-check_compile_time(offsetof(IPHeader, differentiatedServices) == 1);
-check_compile_time(offsetof(IPHeader, totalLength) == 2);
-check_compile_time(offsetof(IPHeader, identification) == 4);
-check_compile_time(offsetof(IPHeader, flagsAndFragmentOffset) == 6);
-check_compile_time(offsetof(IPHeader, timeToLive) == 8);
-check_compile_time(offsetof(IPHeader, protocol) == 9);
-check_compile_time(offsetof(IPHeader, headerChecksum) == 10);
-check_compile_time(offsetof(IPHeader, sourceAddress) == 12);
-check_compile_time(offsetof(IPHeader, destinationAddress) == 16);
+/*! Describes the on-the-wire header format for an ICMP ping.
+ *  \details This defines the header structure of ping packets on the wire.  Both IPv4 and
+ *      IPv6 use the same basic structure.
+ *
+ *      This is declared in the header because clients of PingFoundation might want to use
+ *      it parse received ping packets.
+ */
 
 // ICMP type and code combinations:
 
-enum
-{
-    kICMPTypeEchoReply   = 0,           // code is always 0
-    kICMPTypeEchoRequest = 8            // code is always 0
+enum {
+    ICMPv4TypeEchoRequest = 8,          ///< The ICMP `type` for a ping request; in this case `code` is always 0.
+    ICMPv4TypeEchoReply   = 0           ///< The ICMP `type` for a ping response; in this case `code` is always 0.
+};
+
+enum {
+    ICMPv6TypeEchoRequest = 128,        ///< The ICMP `type` for a ping request; in this case `code` is always 0.
+    ICMPv6TypeEchoReply   = 129         ///< The ICMP `type` for a ping response; in this case `code` is always 0.
 };
 
 // ICMP header structure:

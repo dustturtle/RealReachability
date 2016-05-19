@@ -1,52 +1,50 @@
 /*
- Contains:   Implements ping.
+ Copyright (C) 2016 Apple Inc. All Rights Reserved.
+ LICENSE:
+ IMPORTANT:  This Apple software is supplied to you by Apple
+ Inc. ("Apple") in consideration of your agreement to the following
+ terms, and your use, installation, modification or redistribution of
+ this Apple software constitutes acceptance of these terms.  If you do
+ not agree with these terms, please do not use, install, modify or
+ redistribute this Apple software.
  
- Written by: DTS
+ In consideration of your agreement to abide by the following terms, and
+ subject to these terms, Apple grants you a personal, non-exclusive
+ license, under Apple's copyrights in this original Apple software (the
+ "Apple Software"), to use, reproduce, modify and redistribute the Apple
+ Software, with or without modifications, in source and/or binary forms;
+ provided that if you redistribute the Apple Software in its entirety and
+ without modifications, you must retain this notice and the following
+ text and disclaimers in all such redistributions of the Apple Software.
+ Neither the name, trademarks, service marks or logos of Apple Inc. may
+ be used to endorse or promote products derived from the Apple Software
+ without specific prior written permission from Apple.  Except as
+ expressly stated in this notice, no other rights or licenses, express or
+ implied, are granted by Apple herein, including but not limited to any
+ patent rights that may be infringed by your derivative works or by other
+ works in which the Apple Software may be incorporated.
  
- Copyright:  Copyright (c) 2010-2012 Apple Inc. All Rights Reserved.
+ The Apple Software is provided by Apple on an "AS IS" basis.  APPLE
+ MAKES NO WARRANTIES, EXPRESS OR IMPLIED, INCLUDING WITHOUT LIMITATION
+ THE IMPLIED WARRANTIES OF NON-INFRINGEMENT, MERCHANTABILITY AND FITNESS
+ FOR A PARTICULAR PURPOSE, REGARDING THE APPLE SOFTWARE OR ITS USE AND
+ OPERATION ALONE OR IN COMBINATION WITH YOUR PRODUCTS.
  
- Disclaimer: IMPORTANT: This Apple software is supplied to you by Apple Inc.
- ("Apple") in consideration of your agreement to the following
- terms, and your use, installation, modification or
- redistribution of this Apple software constitutes acceptance of
- these terms.  If you do not agree with these terms, please do
- not use, install, modify or redistribute this Apple software.
+ IN NO EVENT SHALL APPLE BE LIABLE FOR ANY SPECIAL, INDIRECT, INCIDENTAL
+ OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ INTERRUPTION) ARISING IN ANY WAY OUT OF THE USE, REPRODUCTION,
+ MODIFICATION AND/OR DISTRIBUTION OF THE APPLE SOFTWARE, HOWEVER CAUSED
+ AND WHETHER UNDER THEORY OF CONTRACT, TORT (INCLUDING NEGLIGENCE),
+ STRICT LIABILITY OR OTHERWISE, EVEN IF APPLE HAS BEEN ADVISED OF THE
+ POSSIBILITY OF SUCH DAMAGE.
  
- In consideration of your agreement to abide by the following
- terms, and subject to these terms, Apple grants you a personal,
- non-exclusive license, under Apple's copyrights in this
- original Apple software (the "Apple Software"), to use,
- reproduce, modify and redistribute the Apple Software, with or
- without modifications, in source and/or binary forms; provided
- that if you redistribute the Apple Software in its entirety and
- without modifications, you must retain this notice and the
- following text and disclaimers in all such redistributions of
- the Apple Software. Neither the name, trademarks, service marks
- or logos of Apple Inc. may be used to endorse or promote
- products derived from the Apple Software without specific prior
- written permission from Apple.  Except as expressly stated in
- this notice, no other rights or licenses, express or implied,
- are granted by Apple herein, including but not limited to any
- patent rights that may be infringed by your derivative works or
- by other works in which the Apple Software may be incorporated.
+ Copyright (C) 2016 Apple Inc. All Rights Reserved.
  
- The Apple Software is provided by Apple on an "AS IS" basis.
- APPLE MAKES NO WARRANTIES, EXPRESS OR IMPLIED, INCLUDING
- WITHOUT LIMITATION THE IMPLIED WARRANTIES OF NON-INFRINGEMENT,
- MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE, REGARDING
- THE APPLE SOFTWARE OR ITS USE AND OPERATION ALONE OR IN
- COMBINATION WITH YOUR PRODUCTS.
+ Abstract:
+ An object wrapper around the low-level BSD Sockets ping function.
  
- IN NO EVENT SHALL APPLE BE LIABLE FOR ANY SPECIAL, INDIRECT,
- INCIDENTAL OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED
- TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
- DATA, OR PROFITS; OR BUSINESS INTERRUPTION) ARISING IN ANY WAY
- OUT OF THE USE, REPRODUCTION, MODIFICATION AND/OR DISTRIBUTION
- OF THE APPLE SOFTWARE, HOWEVER CAUSED AND WHETHER UNDER THEORY
- OF CONTRACT, TORT (INCLUDING NEGLIGENCE), STRICT LIABILITY OR
- OTHERWISE, EVEN IF APPLE HAS BEEN ADVISED OF THE POSSIBILITY OF
- SUCH DAMAGE.
- 
+ Modified by dustturtle:openglnewbee@163.com, follow the license below.
  */
 
 #import "PingFoundation.h"
@@ -55,11 +53,51 @@
 #include <netinet/in.h>
 #include <errno.h>
 
-#pragma mark * ICMP On-The-Wire Format
+#pragma mark * IPv4 and ICMPv4 On-The-Wire Format
 
-static uint16_t in_cksum(const void *buffer, size_t bufferLen)
-// This is the standard BSD checksum code, modified to use modern types.
-{
+/*! Describes the on-the-wire header format for an IPv4 packet.
+ *  \details This defines the header structure of IPv4 packets on the wire.  We need
+ *      this in order to skip this header in the IPv4 case, where the kernel passes
+ *      it to us for no obvious reason.
+ */
+
+struct IPv4Header {
+    uint8_t     versionAndHeaderLength;
+    uint8_t     differentiatedServices;
+    uint16_t    totalLength;
+    uint16_t    identification;
+    uint16_t    flagsAndFragmentOffset;
+    uint8_t     timeToLive;
+    uint8_t     protocol;
+    uint16_t    headerChecksum;
+    uint8_t     sourceAddress[4];
+    uint8_t     destinationAddress[4];
+    // options...
+    // data...
+};
+typedef struct IPv4Header IPv4Header;
+
+__Check_Compile_Time(sizeof(IPv4Header) == 20);
+__Check_Compile_Time(offsetof(IPv4Header, versionAndHeaderLength) == 0);
+__Check_Compile_Time(offsetof(IPv4Header, differentiatedServices) == 1);
+__Check_Compile_Time(offsetof(IPv4Header, totalLength) == 2);
+__Check_Compile_Time(offsetof(IPv4Header, identification) == 4);
+__Check_Compile_Time(offsetof(IPv4Header, flagsAndFragmentOffset) == 6);
+__Check_Compile_Time(offsetof(IPv4Header, timeToLive) == 8);
+__Check_Compile_Time(offsetof(IPv4Header, protocol) == 9);
+__Check_Compile_Time(offsetof(IPv4Header, headerChecksum) == 10);
+__Check_Compile_Time(offsetof(IPv4Header, sourceAddress) == 12);
+__Check_Compile_Time(offsetof(IPv4Header, destinationAddress) == 16);
+
+/*! Calculates an IP checksum.
+ *  \details This is the standard BSD checksum code, modified to use modern types.
+ *  \param buffer A pointer to the data to checksum.
+ *  \param bufferLen The length of that data.
+ *  \returns The checksum value, in network byte order.
+ */
+
+static uint16_t in_cksum(const void *buffer, size_t bufferLen) {
+    //
     size_t              bytesLeft;
     int32_t             sum;
     const uint16_t *    cursor;
@@ -103,153 +141,184 @@ static uint16_t in_cksum(const void *buffer, size_t bufferLen)
 
 @interface PingFoundation ()
 
-@property (nonatomic, copy,   readwrite) NSData *           hostAddress;
-@property (nonatomic, assign, readwrite) uint16_t           nextSequenceNumber;
-@property (nonatomic, assign, readwrite) BOOL				isStopped;
+// read/write versions of public properties
 
-- (void)stopHostResolution;
-- (void)stopDataTransfer;
+@property (nonatomic, copy,   readwrite, nullable) NSData *     hostAddress;
+@property (nonatomic, assign, readwrite          ) uint16_t     nextSequenceNumber;
+
+// private properties
+
+/*! True if nextSequenceNumber has wrapped from 65535 to 0.
+ */
+
+@property (nonatomic, assign, readwrite)           BOOL         nextSequenceNumberHasWrapped;
+
+/*! A host object for name-to-address resolution.
+ */
+
+@property (nonatomic, strong, readwrite, nullable) CFHostRef host __attribute__ ((NSObject));
+
+/*! A socket object for ICMP send and receive.
+ */
+
+@property (nonatomic, strong, readwrite, nullable) CFSocketRef socket __attribute__ ((NSObject));
 
 @end
 
 @implementation PingFoundation
-{
-    CFHostRef               _host;
-    CFSocketRef             _socket;
-}
 
-@synthesize hostName           = _hostName;
-@synthesize hostAddress        = _hostAddress;
-
-@synthesize delegate           = _delegate;
-@synthesize identifier         = _identifier;
-@synthesize nextSequenceNumber = _nextSequenceNumber;
-
-- (id)initWithHostName:(NSString *)hostName address:(NSData *)hostAddress
-// The initialiser common to both of our construction class methods.
-{
-    if ([hostName length] <= 0 && [hostAddress length] <= 0)
-    {
-        return nil;
-    }
-
+- (instancetype)initWithHostName:(NSString *)hostName {
+    NSParameterAssert(hostName != nil);
     self = [super init];
-    if (self != nil)
-    {
-        self->_hostName    = [hostName copy];
-        self->_hostAddress = [hostAddress copy];
-        self->_identifier  = (uint16_t) arc4random();
+    if (self != nil) {
+        self->_hostName   = [hostName copy];
+        self->_identifier = (uint16_t) arc4random();
     }
     return self;
 }
 
-- (void)dealloc
-{
-    // -stop takes care of _host and _socket.
+- (void)dealloc {
     [self stop];
+    // Double check that -stop took care of _host and _socket.
+    assert(self->_host == NULL);
+    assert(self->_socket == NULL);
 }
 
-+ (PingFoundation *)pingFoundationWithHostName:(NSString *)hostName
-// See comment in header.
-{
-    return [[PingFoundation alloc] initWithHostName:hostName address:nil];
+- (sa_family_t)hostAddressFamily {
+    sa_family_t     result;
+    
+    result = AF_UNSPEC;
+    if ( (self.hostAddress != nil) && (self.hostAddress.length >= sizeof(struct sockaddr)) ) {
+        result = ((const struct sockaddr *) self.hostAddress.bytes)->sa_family;
+    }
+    return result;
 }
 
-+ (PingFoundation *)pingFoundationWithHostAddress:(NSData *)hostAddress
-// See comment in header.
-{
-    return [[PingFoundation alloc] initWithHostName:nil address:hostAddress];
-}
+/*! Shuts down the pinger object and tell the delegate about the error.
+ *  \param error Describes the failure.
+ */
 
-- (void)noop
-{
-}
-
-- (void)didFailWithError:(NSError *)error
-// Shut down the pinger object and tell the delegate about the error.
-{
+- (void)didFailWithError:(NSError *)error {
+    id<PingFoundationDelegate>  strongDelegate;
+    
+    assert(error != nil);
+    
     // We retain ourselves temporarily because it's common for the delegate method
-    // to release its last reference to use, which causes -dealloc to be called here.
+    // to release its last reference to us, which causes -dealloc to be called here.
     // If we then reference self on the return path, things go badly.  I don't think
     // that happens currently, but I've got into the habit of doing this as a
     // defensive measure.
     
-    [self performSelector:@selector(noop) withObject:nil afterDelay:0.0];
+    CFAutorelease( CFBridgingRetain( self ));
     
     [self stop];
-    if ( (self.delegate != nil) && [self.delegate respondsToSelector:@selector(pingFoundation:didFailWithError:)] ) {
-        [self.delegate pingFoundation:self didFailWithError:error];
+    strongDelegate = self.delegate;
+    if ( (strongDelegate != nil) && [strongDelegate respondsToSelector:@selector(pingFoundation:didFailWithError:)] ) {
+        [strongDelegate pingFoundation:self didFailWithError:error];
     }
 }
 
-- (void)didFailWithHostStreamError:(CFStreamError)streamError
-// Convert the CFStreamError to an NSError and then call through to
-// -didFailWithError: to shut down the pinger object and tell the
-// delegate about the error.
-{
+/*! Shuts down the pinger object and tell the delegate about the error.
+ *  \details This converts the CFStreamError to an NSError and then call through to
+ *      -didFailWithError: to do the real work.
+ *  \param streamError Describes the failure.
+ */
+
+- (void)didFailWithHostStreamError:(CFStreamError)streamError {
     NSDictionary *  userInfo;
     NSError *       error;
     
     if (streamError.domain == kCFStreamErrorDomainNetDB) {
-        userInfo = [NSDictionary dictionaryWithObjectsAndKeys:
-                    [NSNumber numberWithInteger:streamError.error], kCFGetAddrInfoFailureKey,
-                    nil
-                    ];
+        userInfo = @{(id) kCFGetAddrInfoFailureKey: @(streamError.error)};
     } else {
         userInfo = nil;
     }
-    error = [NSError errorWithDomain:(NSString *)kCFErrorDomainCFNetwork code:kCFHostErrorUnknown userInfo:userInfo];
+    error = [NSError errorWithDomain:(NSString *) kCFErrorDomainCFNetwork code:kCFHostErrorUnknown userInfo:userInfo];
     
     [self didFailWithError:error];
 }
 
-- (void)sendPingWithData:(NSData *)data
-// See comment in header.
-{
-    int             err;
-    NSData *        payload;
-    NSMutableData * packet;
-    ICMPHeader *    icmpPtr;
-    ssize_t         bytesSent;
+/*! Builds a ping packet from the supplied parameters.
+ *  \param type The packet type, which is different for IPv4 and IPv6.
+ *  \param payload Data to place after the ICMP header.
+ *  \param requiresChecksum Determines whether a checksum is calculated (IPv4) or not (IPv6).
+ *  \returns A ping packet suitable to be passed to the kernel.
+ */
+
+- (NSData *)pingPacketWithType:(uint8_t)type payload:(NSData *)payload requiresChecksum:(BOOL)requiresChecksum {
+    NSMutableData *         packet;
+    ICMPHeader *            icmpPtr;
     
-    // Construct the ping packet.
+    packet = [NSMutableData dataWithLength:sizeof(*icmpPtr) + payload.length];
+    assert(packet != nil);
     
-    payload = data;
-    if (payload == nil)
-    {
-        // payload lenth here should be 56.
-        payload = [[NSString stringWithFormat:@"%28zd bottles of beer on the wall", (ssize_t) 99 - (size_t) (self.nextSequenceNumber % 100) ] dataUsingEncoding:NSASCIIStringEncoding];
-    }
-    
-    packet = [NSMutableData dataWithLength:sizeof(*icmpPtr) + [payload length]];
-    
-    icmpPtr = [packet mutableBytes];
-    icmpPtr->type = kICMPTypeEchoRequest;
+    icmpPtr = packet.mutableBytes;
+    icmpPtr->type = type;
     icmpPtr->code = 0;
     icmpPtr->checksum = 0;
     icmpPtr->identifier     = OSSwapHostToBigInt16(self.identifier);
     icmpPtr->sequenceNumber = OSSwapHostToBigInt16(self.nextSequenceNumber);
     memcpy(&icmpPtr[1], [payload bytes], [payload length]);
     
-    // The IP checksum returns a 16-bit number that's already in correct byte order
-    // (due to wacky 1's complement maths), so we just put it into the packet as a
-    // 16-bit unit.
+    if (requiresChecksum) {
+        // The IP checksum routine returns a 16-bit number that's already in correct byte order
+        // (due to wacky 1's complement maths), so we just put it into the packet as a 16-bit unit.
+        
+        icmpPtr->checksum = in_cksum(packet.bytes, packet.length);
+    }
     
-    icmpPtr->checksum = in_cksum([packet bytes], [packet length]);
+    return packet;
+}
+
+- (void)sendPingWithData:(NSData *)data {
+    int                     err;
+    NSData *                payload;
+    NSData *                packet;
+    ssize_t                 bytesSent;
+    id<PingFoundationDelegate>  strongDelegate;
+    
+    // data may be nil
+    NSParameterAssert(self.hostAddress != nil);     // gotta wait for -PingFoundation:didStartWithAddress:
+    
+    // Construct the ping packet.
+    
+    payload = data;
+    if (payload == nil) {
+        payload = [[NSString stringWithFormat:@"%28zd bottles of beer on the wall", (ssize_t) 99 - (size_t) (self.nextSequenceNumber % 100) ] dataUsingEncoding:NSASCIIStringEncoding];
+        assert(payload != nil);
+        
+        // Our dummy payload is sized so that the resulting ICMP packet, including the ICMPHeader, is
+        // 64-bytes, which makes it easier to recognise our packets on the wire.
+        
+        assert([payload length] == 56);
+    }
+    
+    switch (self.hostAddressFamily) {
+        case AF_INET: {
+            packet = [self pingPacketWithType:ICMPv4TypeEchoRequest payload:payload requiresChecksum:YES];
+        } break;
+        case AF_INET6: {
+            packet = [self pingPacketWithType:ICMPv6TypeEchoRequest payload:payload requiresChecksum:NO];
+        } break;
+        default: {
+            assert(NO);
+        } break;
+    }
+    assert(packet != nil);
     
     // Send the packet.
     
-    if (self->_socket == NULL) {
+    if (self.socket == NULL) {
         bytesSent = -1;
         err = EBADF;
     } else {
         bytesSent = sendto(
-                           CFSocketGetNative(self->_socket),
-                           [packet bytes],
-                           [packet length],
+                           CFSocketGetNative(self.socket),
+                           packet.bytes,
+                           packet.length,
                            0,
-                           (struct sockaddr *) [self.hostAddress bytes],
-                           (socklen_t) [self.hostAddress length]
+                           self.hostAddress.bytes,
+                           (socklen_t) self.hostAddress.length
                            );
         err = 0;
         if (bytesSent < 0) {
@@ -259,72 +328,97 @@ static uint16_t in_cksum(const void *buffer, size_t bufferLen)
     
     // Handle the results of the send.
     
-    if ( (bytesSent > 0) && (((NSUInteger) bytesSent) == [packet length]) )
-    {
+    strongDelegate = self.delegate;
+    if ( (bytesSent > 0) && (((NSUInteger) bytesSent) == packet.length) ) {
+        
         // Complete success.  Tell the client.
-        if ( (self.delegate != nil) && [self.delegate respondsToSelector:@selector(pingFoundation:didSendPacket:)] )
-        {
-            [self.delegate pingFoundation:self didSendPacket:packet];
+        
+        if ( (strongDelegate != nil) && [strongDelegate respondsToSelector:@selector(pingFoundation:didSendPacket:sequenceNumber:)] ) {
+            [strongDelegate pingFoundation:self didSendPacket:packet sequenceNumber:self.nextSequenceNumber];
         }
-    }
-    else
-    {
+    } else {
         NSError *   error;
         
         // Some sort of failure.  Tell the client.
         
-        if (err == 0)
-        {
+        if (err == 0) {
             err = ENOBUFS;          // This is not a hugely descriptor error, alas.
         }
         error = [NSError errorWithDomain:NSPOSIXErrorDomain code:err userInfo:nil];
-        if ( (self.delegate != nil) && [self.delegate respondsToSelector:@selector(pingFoundation:didFailToSendPacket:error:)] )
-        {
-            [self.delegate pingFoundation:self didFailToSendPacket:packet error:error];
+        if ( (strongDelegate != nil) && [strongDelegate respondsToSelector:@selector(pingFoundation:didFailToSendPacket:sequenceNumber:error:)] ) {
+            [strongDelegate pingFoundation:self didFailToSendPacket:packet sequenceNumber:self.nextSequenceNumber error:error];
         }
     }
     
     self.nextSequenceNumber += 1;
+    if (self.nextSequenceNumber == 0) {
+        self.nextSequenceNumberHasWrapped = YES;
+    }
 }
 
-+ (NSUInteger)icmpHeaderOffsetInPacket:(NSData *)packet
-// Returns the offset of the ICMPHeader within an IP packet.
-{
-    NSUInteger              result;
-    const struct IPHeader * ipPtr;
-    size_t                  ipHeaderLength;
+/*! Calculates the offset of the ICMP header within an IPv4 packet.
+ *  \details In the IPv4 case the kernel returns us a buffer that includes the
+ *      IPv4 header.  We're not interested in that, so we have to skip over it.
+ *      This code does a rough check of the IPv4 header and, if it looks OK,
+ *      returns the offset of the ICMP header.
+ *  \param packet The IPv4 packet, as returned to us by the kernel.
+ *  \returns The offset of the ICMP header, or NSNotFound.
+ */
+
++ (NSUInteger)icmpHeaderOffsetInIPv4Packet:(NSData *)packet {
+    // Returns the offset of the ICMPv4Header within an IP packet.
+    NSUInteger                  result;
+    const struct IPv4Header *   ipPtr;
+    size_t                      ipHeaderLength;
     
     result = NSNotFound;
-    if ([packet length] >= (sizeof(IPHeader) + sizeof(ICMPHeader))) {
-        ipPtr = (const IPHeader *) [packet bytes];
-        //assert((ipPtr->versionAndHeaderLength & 0xF0) == 0x40);     // IPv4
-        //assert(ipPtr->protocol == 1);                               // ICMP
-        ipHeaderLength = (ipPtr->versionAndHeaderLength & 0x0F) * sizeof(uint32_t);
-        if ([packet length] >= (ipHeaderLength + sizeof(ICMPHeader))) {
-            result = ipHeaderLength;
+    if (packet.length >= (sizeof(IPv4Header) + sizeof(ICMPHeader))) {
+        ipPtr = (const IPv4Header *) packet.bytes;
+        if ( ((ipPtr->versionAndHeaderLength & 0xF0) == 0x40) &&            // IPv4
+            ( ipPtr->protocol == IPPROTO_ICMP ) ) {
+            ipHeaderLength = (ipPtr->versionAndHeaderLength & 0x0F) * sizeof(uint32_t);
+            if (packet.length >= (ipHeaderLength + sizeof(ICMPHeader))) {
+                result = ipHeaderLength;
+            }
         }
     }
     return result;
 }
 
-+ (const struct ICMPHeader *)icmpInPacket:(NSData *)packet
-// See comment in header.
-{
-    const struct ICMPHeader *   result;
-    NSUInteger                  icmpHeaderOffset;
-    
-    result = nil;
-    icmpHeaderOffset = [self icmpHeaderOffsetInPacket:packet];
-    if (icmpHeaderOffset != NSNotFound) {
-        result = (const struct ICMPHeader *) (((const uint8_t *)[packet bytes]) + icmpHeaderOffset);
+/*! Checks whether the specified sequence number is one we sent.
+ *  \param sequenceNumber The incoming sequence number.
+ *  \returns YES if the sequence number looks like one we sent.
+ */
+
+- (BOOL)validateSequenceNumber:(uint16_t)sequenceNumber {
+    if (self.nextSequenceNumberHasWrapped) {
+        // If the sequence numbers have wrapped that we can't reliably check
+        // whether this is a sequence number we sent.  Rather, we check to see
+        // whether the sequence number is within the last 120 sequence numbers
+        // we sent.  Note that the uint16_t subtraction here does the right
+        // thing regardless of the wrapping.
+        //
+        // Why 120?  Well, if we send one ping per second, 120 is 2 minutes, which
+        // is the standard "max time a packet can bounce around the Internet" value.
+        return ((uint16_t) (self.nextSequenceNumber - sequenceNumber)) < (uint16_t) 120;
+    } else {
+        return sequenceNumber < self.nextSequenceNumber;
     }
-    return result;
 }
 
-- (BOOL)isValidPingResponsePacket:(NSMutableData *)packet
-// Returns true if the packet looks like a valid ping response packet destined
-// for us.
-{
+/*! Checks whether an incoming IPv4 packet looks like a ping response.
+ *  \details This routine modifies this `packet` data!  It does this for two reasons:
+ *
+ *      * It needs to zero out the `checksum` field of the ICMPHeader in order to do
+ *          its checksum calculation.
+ *
+ *      * It removes the IPv4 header from the front of the packet.
+ *  \param packet The IPv4 packet, as returned to us by the kernel.
+ *  \param sequenceNumberPtr A pointer to a place to start the ICMP sequence number.
+ *  \returns YES if the packet looks like a reasonable IPv4 ping response.
+ */
+
+- (BOOL)validatePing4ResponsePacket:(NSMutableData *)packet sequenceNumber:(uint16_t *)sequenceNumberPtr {
     BOOL                result;
     NSUInteger          icmpHeaderOffset;
     ICMPHeader *        icmpPtr;
@@ -333,19 +427,28 @@ static uint16_t in_cksum(const void *buffer, size_t bufferLen)
     
     result = NO;
     
-    icmpHeaderOffset = [[self class] icmpHeaderOffsetInPacket:packet];
+    icmpHeaderOffset = [[self class] icmpHeaderOffsetInIPv4Packet:packet];
     if (icmpHeaderOffset != NSNotFound) {
-        icmpPtr = (struct ICMPHeader *) (((uint8_t *)[packet mutableBytes]) + icmpHeaderOffset);
+        icmpPtr = (struct ICMPHeader *) (((uint8_t *) packet.mutableBytes) + icmpHeaderOffset);
         
         receivedChecksum   = icmpPtr->checksum;
         icmpPtr->checksum  = 0;
-        calculatedChecksum = in_cksum(icmpPtr, [packet length] - icmpHeaderOffset);
+        calculatedChecksum = in_cksum(icmpPtr, packet.length - icmpHeaderOffset);
         icmpPtr->checksum  = receivedChecksum;
         
         if (receivedChecksum == calculatedChecksum) {
-            if ( (icmpPtr->type == kICMPTypeEchoReply) && (icmpPtr->code == 0) ) {
+            if ( (icmpPtr->type == ICMPv4TypeEchoReply) && (icmpPtr->code == 0) ) {
                 if ( OSSwapBigToHostInt16(icmpPtr->identifier) == self.identifier ) {
-                    if ( OSSwapBigToHostInt16(icmpPtr->sequenceNumber) < self.nextSequenceNumber ) {
+                    uint16_t    sequenceNumber;
+                    
+                    sequenceNumber = OSSwapBigToHostInt16(icmpPtr->sequenceNumber);
+                    if ([self validateSequenceNumber:sequenceNumber]) {
+                        
+                        // Remove the IPv4 header off the front of the data we received, leaving us with
+                        // just the ICMP header and the ping payload.
+                        [packet replaceBytesInRange:NSMakeRange(0, icmpHeaderOffset) withBytes:NULL length:0];
+                        
+                        *sequenceNumberPtr = sequenceNumber;
                         result = YES;
                     }
                 }
@@ -356,10 +459,72 @@ static uint16_t in_cksum(const void *buffer, size_t bufferLen)
     return result;
 }
 
-- (void)readData
-// Called by the socket handling code (SocketReadCallback) to process an ICMP
-// messages waiting on the socket.
-{
+/*! Checks whether an incoming IPv6 packet looks like a ping response.
+ *  \param packet The IPv6 packet, as returned to us by the kernel; note that this routine
+ *      could modify this data but does not need to in the IPv6 case.
+ *  \param sequenceNumberPtr A pointer to a place to start the ICMP sequence number.
+ *  \returns YES if the packet looks like a reasonable IPv4 ping response.
+ */
+
+- (BOOL)validatePing6ResponsePacket:(NSMutableData *)packet sequenceNumber:(uint16_t *)sequenceNumberPtr {
+    BOOL                    result;
+    const ICMPHeader *      icmpPtr;
+    
+    result = NO;
+    
+    if (packet.length >= sizeof(*icmpPtr)) {
+        icmpPtr = packet.bytes;
+        
+        // In the IPv6 case we don't check the checksum because that's hard (we need to
+        // cook up an IPv6 pseudo header and we don't have the ingredients) and unnecessary
+        // (the kernel has already done this check).
+        
+        if ( (icmpPtr->type == ICMPv6TypeEchoReply) && (icmpPtr->code == 0) ) {
+            if ( OSSwapBigToHostInt16(icmpPtr->identifier) == self.identifier ) {
+                uint16_t    sequenceNumber;
+                
+                sequenceNumber = OSSwapBigToHostInt16(icmpPtr->sequenceNumber);
+                if ([self validateSequenceNumber:sequenceNumber]) {
+                    *sequenceNumberPtr = sequenceNumber;
+                    result = YES;
+                }
+            }
+        }
+    }
+    return result;
+}
+
+/*! Checks whether an incoming packet looks like a ping response.
+ *  \param packet The packet, as returned to us by the kernel; note that may end up modifying
+ *      this data.
+ *  \param sequenceNumberPtr A pointer to a place to start the ICMP sequence number.
+ *  \returns YES if the packet looks like a reasonable IPv4 ping response.
+ */
+
+- (BOOL)validatePingResponsePacket:(NSMutableData *)packet sequenceNumber:(uint16_t *)sequenceNumberPtr {
+    BOOL        result;
+    
+    switch (self.hostAddressFamily) {
+        case AF_INET: {
+            result = [self validatePing4ResponsePacket:packet sequenceNumber:sequenceNumberPtr];
+        } break;
+        case AF_INET6: {
+            result = [self validatePing6ResponsePacket:packet sequenceNumber:sequenceNumberPtr];
+        } break;
+        default: {
+            assert(NO);
+            result = NO;
+        } break;
+    }
+    return result;
+}
+
+/*! Reads data from the ICMP socket.
+ *  \details Called by the socket handling code (SocketReadCallback) to process an ICMP
+ *      message waiting on the socket.
+ */
+
+- (void)readData {
     int                     err;
     struct sockaddr_storage addr;
     socklen_t               addrLen;
@@ -371,48 +536,46 @@ static uint16_t in_cksum(const void *buffer, size_t bufferLen)
     // here (plus it's what <x-man-page://8/ping> uses).
     
     buffer = malloc(kBufferSize);
+    assert(buffer != NULL);
     
-    // Actually read the data.
+    // Actually read the data.  We use recvfrom(), and thus get back the source address,
+    // but we don't actually do anything with it.  It would be trivial to pass it to
+    // the delegate but we don't need it in this example.
     
     addrLen = sizeof(addr);
-    bytesRead = recvfrom(CFSocketGetNative(self->_socket), buffer, kBufferSize, 0, (struct sockaddr *) &addr, &addrLen);
+    bytesRead = recvfrom(CFSocketGetNative(self.socket), buffer, kBufferSize, 0, (struct sockaddr *) &addr, &addrLen);
     err = 0;
-    if (bytesRead < 0)
-    {
+    if (bytesRead < 0) {
         err = errno;
     }
     
     // Process the data we read.
     
-    if (bytesRead > 0)
-    {
-        NSMutableData * packet;
+    if (bytesRead > 0) {
+        NSMutableData *         packet;
+        id<PingFoundationDelegate>  strongDelegate;
+        uint16_t                sequenceNumber;
         
-        packet = [NSMutableData dataWithBytes:buffer length:(NSUInteger)bytesRead];
+        packet = [NSMutableData dataWithBytes:buffer length:(NSUInteger) bytesRead];
+        assert(packet != nil);
         
         // We got some data, pass it up to our client.
         
-        if ([self isValidPingResponsePacket:packet])
-        {
-            if ((self.delegate != nil) && [self.delegate respondsToSelector:@selector(pingFoundation:didReceivePingResponsePacket:)])
-            {
-                [self.delegate pingFoundation:self didReceivePingResponsePacket:packet];
+        strongDelegate = self.delegate;
+        if ( [self validatePingResponsePacket:packet sequenceNumber:&sequenceNumber] ) {
+            if ( (strongDelegate != nil) && [strongDelegate respondsToSelector:@selector(pingFoundation:didReceivePingResponsePacket:sequenceNumber:)] ) {
+                [strongDelegate pingFoundation:self didReceivePingResponsePacket:packet sequenceNumber:sequenceNumber];
+            }
+        } else {
+            if ( (strongDelegate != nil) && [strongDelegate respondsToSelector:@selector(pingFoundation:didReceiveUnexpectedPacket:)] ) {
+                [strongDelegate pingFoundation:self didReceiveUnexpectedPacket:packet];
             }
         }
-        else
-        {
-            if ((self.delegate != nil) && [self.delegate respondsToSelector:@selector(pingFoundation:didReceiveUnexpectedPacket:)])
-            {
-                [self.delegate pingFoundation:self didReceiveUnexpectedPacket:packet];
-            }
-        }
-    }
-    else
-    {
+    } else {
+        
         // We failed to read the data, so shut everything down.
         
-        if (err == 0)
-        {
+        if (err == 0) {
             err = EPIPE;
         }
         [self didFailWithError:[NSError errorWithDomain:NSPOSIXErrorDomain code:err userInfo:nil]];
@@ -424,116 +587,138 @@ static uint16_t in_cksum(const void *buffer, size_t bufferLen)
     // let CFSocket call us again.
 }
 
-static void SocketReadCallback(CFSocketRef s, CFSocketCallBackType type, CFDataRef address, const void *data, void *info)
-// This C routine is called by CFSocket when there's data waiting on our
-// ICMP socket.  It just redirects the call to Objective-C code.
-{
+/*! The callback for our CFSocket object.
+ *  \details This simply routes the call to our `-readData` method.
+ *  \param s See the documentation for CFSocketCallBack.
+ *  \param type See the documentation for CFSocketCallBack.
+ *  \param address See the documentation for CFSocketCallBack.
+ *  \param data See the documentation for CFSocketCallBack.
+ *  \param info See the documentation for CFSocketCallBack; this is actually a pointer to the
+ *      'owning' object.
+ */
+
+static void SocketReadCallback(CFSocketRef s, CFSocketCallBackType type, CFDataRef address, const void *data, void *info) {
+    // This C routine is called by CFSocket when there's data waiting on our
+    // ICMP socket.  It just redirects the call to Objective-C code.
     PingFoundation *    obj;
-    obj = (__bridge PingFoundation *) info;
     
-    if (([obj isKindOfClass:[PingFoundation class]] && type == kCFSocketReadCallBack))
-    {
-        if (s == obj->_socket)
-        {
-            [obj readData];
-        }
-        else
-        {
-            // unmatched, do nothing.
-        }
-    }
+    obj = (__bridge PingFoundation *) info;
+    assert([obj isKindOfClass:[PingFoundation class]]);
+    
+#pragma unused(s)
+    assert(s == obj.socket);
+#pragma unused(type)
+    assert(type == kCFSocketReadCallBack);
+#pragma unused(address)
+    assert(address == nil);
+#pragma unused(data)
+    assert(data == nil);
+    
+    [obj readData];
 }
 
-- (void)startWithHostAddress
-// We have a host address, so let's actually start pinging it.
-{
-    if (self.hostAddress == nil)
-    {
-        return;
-    }
-    
+/*! Starts the send and receive infrastructure.
+ *  \details This is called once we've successfully resolved `hostName` in to
+ *      `hostAddress`.  It's responsible for setting up the socket for sending and
+ *      receiving pings.
+ */
+
+- (void)startWithHostAddress {
     int                     err;
     int                     fd;
-    const struct sockaddr * addrPtr;
+    
+    assert(self.hostAddress != nil);
     
     // Open the socket.
     
-    addrPtr = (const struct sockaddr *) [self.hostAddress bytes];
-    
     fd = -1;
     err = 0;
-    switch (addrPtr->sa_family)
-    {
-        case AF_INET:
-        {
+    switch (self.hostAddressFamily) {
+        case AF_INET: {
             fd = socket(AF_INET, SOCK_DGRAM, IPPROTO_ICMP);
-            if (fd < 0)
-            {
+            if (fd < 0) {
                 err = errno;
             }
-        }
-            break;
-        case AF_INET6:
-            // fall through
-        default:
-        {
+        } break;
+        case AF_INET6: {
+            fd = socket(AF_INET6, SOCK_DGRAM, IPPROTO_ICMPV6);
+            if (fd < 0) {
+                err = errno;
+            }
+        } break;
+        default: {
             err = EPROTONOSUPPORT;
-        }
-            break;
+        } break;
     }
     
-    if (err != 0)
-    {
+    if (err != 0) {
         [self didFailWithError:[NSError errorWithDomain:NSPOSIXErrorDomain code:err userInfo:nil]];
-    }
-    else
-    {
-        CFSocketContext     context = {0, (__bridge void *)(self), NULL, NULL, NULL};
-        CFRunLoopSourceRef  rls;
+    } else {
+        CFSocketContext         context = {0, (__bridge void *)(self), NULL, NULL, NULL};
+        CFRunLoopSourceRef      rls;
+        id<PingFoundationDelegate>  strongDelegate;
         
         // Wrap it in a CFSocket and schedule it on the runloop.
         
-        self->_socket = CFSocketCreateWithNative(NULL, fd, kCFSocketReadCallBack, SocketReadCallback, &context);
+        self.socket = (CFSocketRef) CFAutorelease( CFSocketCreateWithNative(NULL, fd, kCFSocketReadCallBack, SocketReadCallback, &context) );
+        assert(self.socket != NULL);
         
         // The socket will now take care of cleaning up our file descriptor.
+        
+        assert( CFSocketGetSocketFlags(self.socket) & kCFSocketCloseOnInvalidate );
         fd = -1;
         
-        rls = CFSocketCreateRunLoopSource(NULL, self->_socket, 0);
+        rls = CFSocketCreateRunLoopSource(NULL, self.socket, 0);
+        assert(rls != NULL);
         
         CFRunLoopAddSource(CFRunLoopGetCurrent(), rls, kCFRunLoopDefaultMode);
         
         CFRelease(rls);
         
-        if ((self.delegate != nil) && [self.delegate respondsToSelector:@selector(pingFoundation:didStartWithAddress:)])
-        {
-            [self.delegate pingFoundation:self didStartWithAddress:self.hostAddress];
+        strongDelegate = self.delegate;
+        if ( (strongDelegate != nil) && [strongDelegate respondsToSelector:@selector(pingFoundation:didStartWithAddress:)] ) {
+            [strongDelegate pingFoundation:self didStartWithAddress:self.hostAddress];
         }
     }
+    assert(fd == -1);
 }
 
-- (void)hostResolutionDone
-// Called by our CFHost resolution callback (HostResolveCallback) when host
-// resolution is complete.  We just latch the first IPv4 address and kick
-// off the pinging process.
-{
+/*! Processes the results of our name-to-address resolution.
+ *  \details Called by our CFHost resolution callback (HostResolveCallback) when host
+ *      resolution is complete.  We just latch the first appropriate address and kick
+ *      off the send and receive infrastructure.
+ */
+
+- (void)hostResolutionDone {
     Boolean     resolved;
     NSArray *   addresses;
     
-    // Find the first IPv4 address.
+    // Find the first appropriate address.
     
-    addresses = (__bridge NSArray *) CFHostGetAddressing(self->_host, &resolved);
-    if ( resolved && (addresses != nil) )
-    {
+    addresses = (__bridge NSArray *) CFHostGetAddressing(self.host, &resolved);
+    if ( resolved && (addresses != nil) ) {
         resolved = false;
-        for (NSData * address in addresses)
-        {
+        for (NSData * address in addresses) {
             const struct sockaddr * addrPtr;
             
-            addrPtr = (const struct sockaddr *) [address bytes];
-            if ( [address length] >= sizeof(struct sockaddr) && addrPtr->sa_family == AF_INET)
-            {
-                self.hostAddress = address;
-                resolved = true;
+            addrPtr = (const struct sockaddr *) address.bytes;
+            if ( address.length >= sizeof(struct sockaddr) ) {
+                switch (addrPtr->sa_family) {
+                    case AF_INET: {
+                        if (self.addressStyle != PingFoundationAddressStyleICMPv6) {
+                            self.hostAddress = address;
+                            resolved = true;
+                        }
+                    } break;
+                    case AF_INET6: {
+                        if (self.addressStyle != PingFoundationAddressStyleICMPv4) {
+                            self.hostAddress = address;
+                            resolved = true;
+                        }
+                    } break;
+                }
+            }
+            if (resolved) {
                 break;
             }
         }
@@ -543,116 +728,96 @@ static void SocketReadCallback(CFSocketRef s, CFSocketCallBackType type, CFDataR
     
     [self stopHostResolution];
     
-    // If all is OK, start pinging, otherwise shut down the pinger completely.
+    // If all is OK, start the send and receive infrastructure, otherwise stop.
     
-    if (resolved)
-    {
+    if (resolved) {
         [self startWithHostAddress];
-    }
-    else
-    {
+    } else {
         [self didFailWithError:[NSError errorWithDomain:(NSString *)kCFErrorDomainCFNetwork code:kCFHostErrorHostNotFound userInfo:nil]];
     }
 }
 
-static void HostResolveCallback(CFHostRef theHost, CFHostInfoType typeInfo, const CFStreamError *error, void *info)
-// This C routine is called by CFHost when the host resolution is complete.
-// It just redirects the call to the appropriate Objective-C method.
-{
+/*! The callback for our CFHost object.
+ *  \details This simply routes the call to our `-hostResolutionDone` or
+ *      `-didFailWithHostStreamError:` methods.
+ *  \param theHost See the documentation for CFHostClientCallBack.
+ *  \param typeInfo See the documentation for CFHostClientCallBack.
+ *  \param error See the documentation for CFHostClientCallBack.
+ *  \param info See the documentation for CFHostClientCallBack; this is actually a pointer to
+ *      the 'owning' object.
+ */
+
+static void HostResolveCallback(CFHostRef theHost, CFHostInfoType typeInfo, const CFStreamError *error, void *info) {
+    // This C routine is called by CFHost when the host resolution is complete.
+    // It just redirects the call to the appropriate Objective-C method.
     PingFoundation *    obj;
+    
     obj = (__bridge PingFoundation *) info;
+    assert([obj isKindOfClass:[PingFoundation class]]);
     
-    if (([obj isKindOfClass:[PingFoundation class]] && typeInfo == kCFHostAddresses))
-    {
-        if (theHost != obj->_host)
-        {
-            // unmatched, do nothing.
-            return;
-        }
-        
-        if ((error != NULL) && (error->domain != 0))
-        {
-            [obj didFailWithHostStreamError:*error];
-        }
-        else
-        {
-            [obj hostResolutionDone];
-        }
-    }
-}
-
-- (void)start
-// See comment in header.
-{
-    // If the user supplied us with an address, just start pinging that.  Otherwise
-    // start a host resolution.
+#pragma unused(theHost)
+    assert(theHost == obj.host);
+#pragma unused(typeInfo)
+    assert(typeInfo == kCFHostAddresses);
     
-    if (self->_hostAddress != nil)
-    {
-        [self startWithHostAddress];
-    }
-    else
-    {
-        Boolean             success;
-        CFHostClientContext context = {0, (__bridge void *)(self), NULL, NULL, NULL};
-        CFStreamError       streamError;
-        
-        self->_host = CFHostCreateWithName(NULL, (__bridge CFStringRef) self.hostName);
-        if (self->_host == NULL)
-        {
-            // host NULL; do nothing.
-            return;
-        }
-        
-        CFHostSetClient(self->_host, HostResolveCallback, &context);
-        
-        CFHostScheduleWithRunLoop(self->_host, CFRunLoopGetCurrent(), kCFRunLoopDefaultMode);
-        
-        success = CFHostStartInfoResolution(self->_host, kCFHostAddresses, &streamError);
-        //NSLog(@"<CFHostStartInfoResolution");
-        if ( ! success )
-        {
-            [self didFailWithHostStreamError:streamError];
-        }
+    if ( (error != NULL) && (error->domain != 0) ) {
+        [obj didFailWithHostStreamError:*error];
+    } else {
+        [obj hostResolutionDone];
     }
 }
 
-- (void)stopHostResolution
-// Shut down the CFHost.
-{
-    if (self->_host != NULL)
-    {
-        CFHostSetClient(self->_host, NULL, NULL);
-        CFHostUnscheduleFromRunLoop(self->_host, CFRunLoopGetCurrent(), kCFRunLoopDefaultMode);
-        CFRelease(self->_host);
-        self->_host = NULL;
+- (void)start {
+    Boolean             success;
+    CFHostClientContext context = {0, (__bridge void *)(self), NULL, NULL, NULL};
+    CFStreamError       streamError;
+    
+    assert(self.host == NULL);
+    assert(self.hostAddress == nil);
+    
+    self.host = (CFHostRef) CFAutorelease( CFHostCreateWithName(NULL, (__bridge CFStringRef) self.hostName) );
+    assert(self.host != NULL);
+    
+    CFHostSetClient(self.host, HostResolveCallback, &context);
+    
+    CFHostScheduleWithRunLoop(self.host, CFRunLoopGetCurrent(), kCFRunLoopDefaultMode);
+    
+    success = CFHostStartInfoResolution(self.host, kCFHostAddresses, &streamError);
+    if ( ! success ) {
+        [self didFailWithHostStreamError:streamError];
     }
 }
 
-- (void)stopDataTransfer
-// Shut down anything to do with sending and receiving pings.
-{
-    if (self->_socket != NULL)
-    {
-        CFSocketInvalidate(self->_socket);
-        CFRelease(self->_socket);
-        self->_socket = NULL;
+/*! Stops the name-to-address resolution infrastructure.
+ */
+
+- (void)stopHostResolution {
+    // Shut down the CFHost.
+    if (self.host != NULL) {
+        CFHostSetClient(self.host, NULL, NULL);
+        CFHostUnscheduleFromRunLoop(self.host, CFRunLoopGetCurrent(), kCFRunLoopDefaultMode);
+        self.host = NULL;
     }
 }
 
-- (void)stop
-// See comment in header.
-{
+/*! Stops the send and receive infrastructure.
+ */
+
+- (void)stopSocket {
+    if (self.socket != NULL) {
+        CFSocketInvalidate(self.socket);
+        self.socket = NULL;
+    }
+}
+
+- (void)stop {
     [self stopHostResolution];
-    [self stopDataTransfer];
-    // If we were started with a host name, junk the host address on stop.  If the
-    // client calls -start again, we'll re-resolve the host name.
+    [self stopSocket];
     
-    if (self.hostName != nil)
-    {
-        self.hostAddress = NULL;
-    }
+    // Junk the host address on stop.  If the client calls -start again, we'll 
+    // re-resolve the host name.
+    
+    self.hostAddress = NULL;
 }
 
 @end
-

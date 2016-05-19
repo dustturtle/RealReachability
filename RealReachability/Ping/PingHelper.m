@@ -108,7 +108,8 @@ NSString *const kPingResultNotification = @"kPingResultNotification";
     self.pingFoundation.delegate = nil;
     self.pingFoundation = nil;
     
-    self.pingFoundation = [PingFoundation pingFoundationWithHostName:_host];
+    self.pingFoundation = [[PingFoundation alloc] initWithHostName:_host];
+    
     self.pingFoundation.delegate = self;
 }
 
@@ -156,17 +157,22 @@ NSString *const kPingResultNotification = @"kPingResultNotification";
     [self endWithFlag:NO];
 }
 
-- (void)PingFoundation:(PingFoundation *)pinger didFailToSendPacket:(NSData *)packet error:(NSError *)error
+- (void)pingFoundation:(PingFoundation *)pinger didFailToSendPacket:(NSData *)packet sequenceNumber:(uint16_t)sequenceNumber error:(NSError *)error
 {
     [self endWithFlag:NO];
 }
 
-- (void)pingFoundation:(PingFoundation *)pinger didReceivePingResponsePacket:(NSData *)packet
+- (void)pingFoundation:(PingFoundation *)pinger didReceivePingResponsePacket:(NSData *)packet sequenceNumber:(uint16_t)sequenceNumber
 {
     [self endWithFlag:YES];
 }
 
-- (void)pingFoundation:(PingFoundation *)pinger didSendPacket:(NSData *)packet
+- (void)pingFoundation:(PingFoundation *)pinger didSendPacket:(NSData *)packet sequenceNumber:(uint16_t)sequenceNumber
+{
+    
+}
+
+- (void)pingFoundation:(PingFoundation *)pinger didReceiveUnexpectedPacket:(NSData *)packet
 {
     
 }
