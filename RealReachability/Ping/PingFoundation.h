@@ -144,10 +144,6 @@ typedef NS_ENUM(NSInteger, PingFoundationAddressStyle) {
 // Stops the pinger object.  You should call this when you're done
 // pinging.
 
-+ (const struct ICMPHeader *)icmpInPacket:(NSData *)packet;
-// Given a valid IP packet contains an ICMP , returns the address of the ICMP header that
-// follows the IP header.  This doesn't do any significant validation of the packet.
-
 @end
 
 @protocol PingFoundationDelegate <NSObject>
