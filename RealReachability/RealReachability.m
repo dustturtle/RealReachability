@@ -17,7 +17,7 @@
 #define NSLog(...)
 #endif
 
-#define kDefaultHost @"www.baidu.com"
+#define kDefaultHost @"www.apple.com"
 #define kDefaultCheckInterval 2.0f
 
 #define kMinAutoCheckInterval 0.3f
