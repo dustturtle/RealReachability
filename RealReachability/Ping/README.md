@@ -1,4 +1,4 @@
-# SimplePing by apple(That is where PingFoundation modified from!!!)
+# SimplePing by apple(That is where PingFoundation modified from!!!Many Thanks to APPLE!)
 
 1.4
 
