@@ -7,7 +7,7 @@
 
 
 #####[NEWS FROM APPLE](https://developer.apple.com/news/?id=05042016a): Starting June 1, 2016 all apps submitted to the App Store MUST support IPv6-only networking.
-### RealReachability SUPPORT IPV6 NOW. PLEASE UPDATE TO POD VERSION 1.1.5 OR THE LATEST MASTER VERSION.
+### RealReachability SUPPORT IPV6 NOW. PLEASE UPDATE TO THE LATEST MASTER VERSION.
 ###Found any issue around IPV6, contact me as soon as possible, Thank you!
 #Why RealReachability?
 As we know, we already have reachability framework for us to choose. Such as the famous repository [Reachability](https://github.com/tonymillion/Reachability).
@@ -41,7 +41,7 @@ To integrate RealReachability into your Xcode project using CocoaPods, specify i
 source 'https://github.com/CocoaPods/Specs.git'
 platform :ios, '6.0'
 
-pod 'RealReachability', '~> 1.1.5'
+pod 'RealReachability'
 ```
 
 Then, run the following command:
@@ -73,9 +73,9 @@ If you'd rather do everything by hand, just add the folder "RealReachability" to
 ####Add Observer(anywhere you like):
 ```objective-c
 [[NSNotificationCenter defaultCenter] addObserver:self
-                                             selector:@selector(networkChanged:)
-                                                 name:kRealReachabilityChangedNotification
-                                               object:nil];
+                                         selector:@selector(networkChanged:)
+                                             name:kRealReachabilityChangedNotification
+                                           object:nil];
 
 ```
 
@@ -125,10 +125,10 @@ ReachabilityStatus status = [reachability currentReachabilityStatus];
 Once the reachabilityWithBlock was called, the "currentReachabilityStatus" will be refreshed synchronously.
 #### Set your own host for Ping (optional)
 Please make sure the host you set here is available for pinging. Large, stable website suggested.   
-This step is optional. If you do not set this, our default host is: www.baidu.com.   
+This step is optional. If you do not set this, our default host is: www.apple.com.   
 You may set your own host any time you like. Codes just like below:
 ```
-GLobalRealReachability.hostForPing = @"www.baidu.com";
+GLobalRealReachability.hostForPing = @"www.apple.com";
 ```
 
 #### Get current WWAN type (optional)
