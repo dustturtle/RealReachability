@@ -153,7 +153,7 @@ NSString *const kRealReachabilityChangedNotification = @"kRealReachabilityChange
 
 #pragma mark - outside invoke
 
-- (void)reachabilityWithBlock:(void (^)(ReachabilityStatus))asyncHandler
+- (void)reachabilityWithBlock:(void (^)(ReachabilityStatus status))asyncHandler
 {
     // logic optimization: no need to ping when Local connection unavailable!
     if ([GLocalConnection currentLocalConnectionStatus] == LC_UnReachable)

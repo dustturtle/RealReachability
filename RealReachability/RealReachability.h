@@ -71,7 +71,7 @@ typedef NS_ENUM(NSInteger, WWANAccessType) {
  *
  *  @param asyncHandler async request handler, return in 2 seconds(max limit).
  */
-- (void)reachabilityWithBlock:(void (^)(ReachabilityStatus))asyncHandler;
+- (void)reachabilityWithBlock:(void (^)(ReachabilityStatus status))asyncHandler;
 
 /**
  *  Return current reachability immediately.
