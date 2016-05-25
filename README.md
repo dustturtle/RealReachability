@@ -1,13 +1,13 @@
 # RealReachability
-[![Version](https://img.shields.io/badge/pod-1.1.5-yellow.svg)](http://cocoadocs.org/docsets/RealReachability/1.1.5/)
-[![License](https://img.shields.io/badge/License-MIT-blue.svg)](http://cocoadocs.org/docsets/RealReachability/1.1.5/)
-[![Platform](https://img.shields.io/badge/Platform-iOS-orange.svg)](http://cocoadocs.org/docsets/RealReachability/1.1.5/)
-[![Platform](https://img.shields.io/badge/Build-Passed-green.svg)](http://cocoadocs.org/docsets/RealReachability/1.1.5/)
+[![Version](https://img.shields.io/badge/pod-1.1.7-yellow.svg)](http://cocoadocs.org/docsets/RealReachability/1.1.7/)
+[![License](https://img.shields.io/badge/License-MIT-blue.svg)](http://cocoadocs.org/docsets/RealReachability/1.1.7/)
+[![Platform](https://img.shields.io/badge/Platform-iOS-orange.svg)](http://cocoadocs.org/docsets/RealReachability/1.1.7/)
+[![Platform](https://img.shields.io/badge/Build-Passed-green.svg)](http://cocoadocs.org/docsets/RealReachability/1.1.7/)
 ####We need to observe the REAL reachability of network for iOS. That's what RealReachability do.
 
 
 #####[NEWS FROM APPLE](https://developer.apple.com/news/?id=05042016a): Starting June 1, 2016 all apps submitted to the App Store MUST support IPv6-only networking.
-### RealReachability SUPPORT IPV6 NOW. PLEASE UPDATE TO THE LATEST MASTER VERSION.
+### RealReachability SUPPORT IPV6 NOW. PLEASE UPDATE TO POD VERSION 1.1.7 OR THE LATEST MASTER VERSION.
 ###Found any issue around IPV6, contact me as soon as possible, Thank you!
 #Why RealReachability?
 As we know, we already have reachability framework for us to choose. Such as the famous repository [Reachability](https://github.com/tonymillion/Reachability).
@@ -137,6 +137,27 @@ GLobalRealReachability.hostForPing = @"www.apple.com";
 
 ```
 Current WWAN type might be used to improve your app's user experience(e.g, set different network request timeout interval for different WWAN type).
+#### More:
+We can also use PingHelper or LocalConnection alone to make a ping action or just observe the local connection.  
+Pod usage like blow (we have two pod subspecs):
+
+```ruby
+pod 'RealReachability/Ping'
+```
+```ruby
+pod 'RealReachability/Connection'
+```
+This is the only API we need to invoke about Ping:
+
+```objective-c
+- (void)pingWithBlock:(void (^)(BOOL isSuccess))completion;
+
+```
+**More about the ping usage**, please see the **PingHelper.h** or **codes in [the demo project]**(https://github.com/dustturtle/RealReachability).
+
+**LocalConnection module is very similar with Reachability**.   
+**More about its usage**, please see the **LocalConnection.h** or **codes in [the demo project]**(https://github.com/dustturtle/RealReachability). 
+
 
 #Demo
 We already put the demo project in the [repository](https://github.com/dustturtle/RealReachability).
