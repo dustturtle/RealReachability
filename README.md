@@ -153,10 +153,10 @@ This is the only API we need to invoke about Ping:
 - (void)pingWithBlock:(void (^)(BOOL isSuccess))completion;
 
 ```
-**More about the ping usage**, please see the **PingHelper.h** or **codes in [the demo project]**(https://github.com/dustturtle/RealReachability).
+**More about the ping usage**, please see the **PingHelper.h** or codes in [**the demo project**](https://github.com/dustturtle/RealReachability).
 
 **LocalConnection module is very similar with Reachability**.   
-**More about its usage**, please see the **LocalConnection.h** or **codes in [the demo project]**(https://github.com/dustturtle/RealReachability). 
+**More about its usage**, please see the **LocalConnection.h** or codes in [**the demo project**](https://github.com/dustturtle/RealReachability). 
 
 
 #Demo
