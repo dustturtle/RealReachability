@@ -28,6 +28,10 @@ typedef NS_ENUM(NSInteger, LocalConnectionStatus)
 
 @interface LocalConnection : NSObject
 
+/// Newly added property for KVO usage:
+/// maybe you only want to observe the local network is available or not.
+@property (nonatomic, assign) BOOL isReachable;
+
 + (instancetype)sharedInstance;
 
 /**

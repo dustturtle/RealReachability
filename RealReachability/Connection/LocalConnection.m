@@ -119,6 +119,9 @@ static NSString *connectionFlags(SCNetworkReachabilityFlags flags)
     }
 
     // First time we come in, notify the initialization of local connection.
+    
+    self.isReachable = [self _isReachable];
+    
     __weak __typeof(self)weakSelf = self;
     dispatch_async(dispatch_get_main_queue(), ^{
         __strong __typeof(weakSelf)strongSelf = weakSelf;
@@ -139,7 +142,7 @@ static NSString *connectionFlags(SCNetworkReachabilityFlags flags)
 #pragma mark - outside invoke
 - (LocalConnectionStatus)currentLocalConnectionStatus
 {
-    if ([self isReachable])
+    if ([self _isReachable])
     {
         if ([self isReachableViaWiFi])
         {
@@ -160,6 +163,8 @@ static NSString *connectionFlags(SCNetworkReachabilityFlags flags)
 
 - (void)localConnectionChanged
 {
+    self.isReachable = [self _isReachable];
+    
     // this makes sure the change notification happens on the MAIN THREAD
     __weak __typeof(self)weakSelf = self;
     dispatch_async(dispatch_get_main_queue(), ^{
@@ -189,7 +194,8 @@ static NSString *connectionFlags(SCNetworkReachabilityFlags flags)
 
 #pragma mark - LocalReachability
 
-- (BOOL)isReachable
+/// added underline prefix to distinguish the method from the property "isReachable"
+- (BOOL)_isReachable
 {
     SCNetworkReachabilityFlags flags;
     
