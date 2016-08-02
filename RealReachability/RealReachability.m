@@ -363,7 +363,7 @@ NSString *const kRealReachabilityChangedNotification = @"kRealReachabilityChange
 {
     LocalConnection *lc = (LocalConnection *)notification.object;
     LocalConnectionStatus lcStatus = [lc currentLocalConnectionStatus];
-    NSLog(@"currentLocalConnectionStatus:%@",@(lcStatus));
+    //NSLog(@"currentLocalConnectionStatus:%@",@(lcStatus));
     ReachabilityStatus status = [self currentReachabilityStatus];
     
     NSDictionary *inputDic = @{kEventKeyID:@(RREventLocalConnectionCallback), kEventKeyParam:[self paramValueFromStatus:lcStatus]};

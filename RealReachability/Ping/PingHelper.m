@@ -65,7 +65,7 @@ NSString *const kPingResultNotification = @"kPingResultNotification";
 
 - (void)pingWithBlock:(void (^)(BOOL isSuccess))completion
 {
-    NSLog(@"pingWithBlock");
+    //NSLog(@"pingWithBlock");
     if (completion)
     {
         // copy the block, then added to the blocks array.
@@ -106,7 +106,7 @@ NSString *const kPingResultNotification = @"kPingResultNotification";
 
 - (void)startPing
 {
-    NSLog(@"startPing");
+    //NSLog(@"startPing");
     [self clearPingFoundation];
     
     self.isPinging = YES;

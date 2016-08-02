@@ -59,7 +59,7 @@
   
     RRStateID previousStateID = self.currentStateID;
     self.currentStateID = newStateID;
-    NSLog(@"curStateID is %@", @(self.currentStateID));
+    //NSLog(@"curStateID is %@", @(self.currentStateID));
     
     return (previousStateID == self.currentStateID) ? -1 : 0;
 }
