@@ -18,6 +18,9 @@ extern NSString *const kPingResultNotification;
 /// Think about that: if you never set this, we don't know where to ping.
 @property (nonatomic, copy) NSString *host;
 
+// Ping timeout. Default is 2 seconds
+@property (nonatomic, assign) NSTimeInterval timeout;
+
 + (instancetype)sharedInstance;
 
 /**

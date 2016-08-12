@@ -34,7 +34,7 @@ NSString *const kPingResultNotification = @"kPingResultNotification";
     if ((self = [super init]))
     {
         _isPinging = NO;
-        
+        _timeout = 2.0f;
         _completionBlocks = [NSMutableArray array];
     }
     return self;
@@ -115,7 +115,7 @@ NSString *const kPingResultNotification = @"kPingResultNotification";
     self.pingFoundation.delegate = self;
     [self.pingFoundation start];
     
-    [self performSelector:@selector(pingTimeOut) withObject:nil afterDelay:2.0f];
+    [self performSelector:@selector(pingTimeOut) withObject:nil afterDelay:self.timeout];
 }
 
 - (void)setHost:(NSString *)host
