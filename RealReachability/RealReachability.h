@@ -59,6 +59,9 @@ typedef NS_ENUM(NSInteger, WWANAccessType) {
 /// If exceeded, the value will be reset to 0.3f or 60.0f (the closer one).
 @property (nonatomic, assign) float autoCheckInterval;
 
+// Timeout used for ping. Default is 2 seconds
+@property (nonatomic, assign) NSTimeInterval pingTimeout;
+
 + (instancetype)sharedInstance;
 
 - (void)startNotifier;
