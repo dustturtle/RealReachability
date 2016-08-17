@@ -268,6 +268,7 @@ NSString *const kRealReachabilityChangedNotification = @"kRealReachabilityChange
 }
 
 - (void)setPingTimeout:(NSTimeInterval)pingTimeout {
+    _pingTimeout = pingTimeout;
     GPingHelper.timeout = pingTimeout;
 }
 
