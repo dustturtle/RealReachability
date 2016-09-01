@@ -1,14 +1,10 @@
 # RealReachability
-[![Version](https://img.shields.io/badge/pod-1.1.7-yellow.svg)](http://cocoadocs.org/docsets/RealReachability/1.1.7/)
-[![License](https://img.shields.io/badge/License-MIT-blue.svg)](http://cocoadocs.org/docsets/RealReachability/1.1.7/)
-[![Platform](https://img.shields.io/badge/Platform-iOS-orange.svg)](http://cocoadocs.org/docsets/RealReachability/1.1.7/)
-[![Platform](https://img.shields.io/badge/Build-Passed-green.svg)](http://cocoadocs.org/docsets/RealReachability/1.1.7/)
+[![Version](https://img.shields.io/badge/pod-1.1.8-yellow.svg)](http://cocoadocs.org/docsets/RealReachability/1.1.8/)
+[![License](https://img.shields.io/badge/License-MIT-blue.svg)](http://cocoadocs.org/docsets/RealReachability/1.1.8/)
+[![Platform](https://img.shields.io/badge/Platform-iOS-orange.svg)](http://cocoadocs.org/docsets/RealReachability/1.1.8/)
+[![Platform](https://img.shields.io/badge/Build-Passed-green.svg)](http://cocoadocs.org/docsets/RealReachability/1.1.8/)
 ####We need to observe the REAL reachability of network for iOS. That's what RealReachability do.
 
-
-#####[NEWS FROM APPLE](https://developer.apple.com/news/?id=05042016a): Starting June 1, 2016 all apps submitted to the App Store MUST support IPv6-only networking.
-### RealReachability SUPPORT IPV6 NOW. PLEASE UPDATE TO POD VERSION 1.1.7 OR THE LATEST MASTER VERSION.
-###Found any issue around IPV6, contact me as soon as possible, Thank you!
 #Why RealReachability?
 As we know, we already have reachability framework for us to choose. Such as the famous repository [Reachability](https://github.com/tonymillion/Reachability).
 
@@ -48,6 +44,21 @@ Then, run the following command:
 
 ```bash
 $ pod install
+```
+# Installation with Carthage
+[Carthage](https://github.com/Carthage/Carthage) is a decentralized dependency manager that builds your dependencies and provides you with binary frameworks.
+
+You can install Carthage with [Homebrew](http://brew.sh/) using the following command:
+
+```bash
+$ brew update
+$ brew install carthage
+```
+
+RealReachability in your `Cartfile`:
+
+```
+github "dustturtle/RealReachability"
 ```
 
 #Manual Start
