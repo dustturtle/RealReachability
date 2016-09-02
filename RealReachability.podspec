@@ -7,7 +7,7 @@
 #
 Pod::Spec.new do |s|
   s.name         = "RealReachability"
-  s.version      = "1.1.7"
+  s.version      = "1.1.8"
   s.summary      = "We need to observe the REAL reachability of network for iOS. That's what RealReachability do."
 
 
