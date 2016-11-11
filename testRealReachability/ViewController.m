@@ -11,7 +11,9 @@
 
 @interface ViewController ()
 
-@property (weak, nonatomic) IBOutlet UILabel *flagLabel;
+@property (nonatomic, weak) IBOutlet UILabel *flagLabel;
+
+@property (nonatomic, strong) UIAlertView *alert;
 
 @end
 
@@ -43,12 +45,15 @@
     {
         self.flagLabel.text = @"Network WWAN! In charge!";
     }
+    
+    self.alert = [[UIAlertView alloc] initWithTitle:@"RealReachability" message:@"" delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil, nil];
 }
 
 - (void)dealloc
 {
     [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
+
 
 - (IBAction)testAction:(id)sender
 {
@@ -57,19 +62,24 @@
         {
             case RealStatusNotReachable:
             {
-                [[[UIAlertView alloc] initWithTitle:@"RealReachability" message:@"Nothing to do! offlineMode" delegate:self cancelButtonTitle:@"OK" otherButtonTitles:nil , nil] show];
+                self.alert.message = @"Nothing to do! offlineMode";
+                [self.alert show];
+                
                 break;
             }
                 
             case RealStatusViaWiFi:
             {
-                [[[UIAlertView alloc] initWithTitle:@"RealReachability" message:@"Do what you want! free!" delegate:self cancelButtonTitle:@"OK" otherButtonTitles:nil , nil] show];
+                self.alert.message = @"Do what you want! free!";
+                [self.alert show];
+                
                 break;
             }
                 
             case RealStatusViaWWAN:
             {
-                [[[UIAlertView alloc] initWithTitle:@"RealReachability" message:@"Take care of your money! You are in charge!" delegate:self cancelButtonTitle:@"OK" otherButtonTitles:nil , nil] show];
+                self.alert.message = @"Take care of your money! You are in charge!";
+                [self.alert show];
                 
                 WWANAccessType accessType = [GLobalRealReachability currentWWANtype];
                 if (accessType == WWANType2G)
@@ -141,8 +151,6 @@
             self.flagLabel.text = @"Unknown RealReachability WWAN Status, might be iOS6";
         }
     }
-    
-    
 }
 
 @end
