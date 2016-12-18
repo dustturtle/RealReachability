@@ -1,5 +1,5 @@
 //
-//  FSMDefines.h
+//  RRDefines.h
 //  RealReachability
 //  Defines of FSM (finite state machine)
 //
@@ -7,8 +7,8 @@
 //  Copyright © 2016 Dustturtle. All rights reserved.
 //
 
-#ifndef FSMDefine_h
-#define FSMDefine_h
+#ifndef RRDefine_h
+#define RRDefine_h
 
 #define kEventKeyID         @"event_id"
 #define kEventKeyParam      @"event_param"
@@ -19,12 +19,12 @@
 
 typedef enum
 {
-    RRStateInvalid = -1,
-    RRStateUnloaded = 0,
-    RRStateLoading,
-    RRStateUnReachable,
-    RRStateWIFI,
-    RRStateWWAN
+    RRStateIDInvalid = -1,
+    RRStateIDUnloaded = 0,
+    RRStateIDLoading,
+    RRStateIDUnreachable,
+    RRStateIDWIFI,
+    RRStateIDWWAN
 }RRStateID;
 
 typedef enum
@@ -38,4 +38,4 @@ typedef enum
 /// FSM error codes below
 #define kFSMErrorNotAccept 13
 
-#endif /* FSMDefine_h */
+#endif /* RRDefine_h */

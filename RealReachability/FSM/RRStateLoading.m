@@ -1,18 +1,18 @@
 //
-//  ReachStateLoading.m
+//  RRStateLoading.m
 //  RealReachability
 //
 //  Created by Dustturtle on 16/1/9.
 //  Copyright (c) 2016 Dustturtle. All rights reserved.
 //
 
-#import "ReachStateLoading.h"
+#import "RRStateLoading.h"
 
-@implementation ReachStateLoading
+@implementation RRStateLoading
 
 - (RRStateID)onEvent:(NSDictionary *)event withError:(NSError **)error
 {
-    RRStateID resStateID = RRStateLoading;
+    RRStateID resStateID = RRStateIDLoading;
     
     NSNumber *eventID = event[kEventKeyID];
     
@@ -20,18 +20,18 @@
     {
         case RREventUnLoad:
         {
-            resStateID = RRStateUnloaded;
+            resStateID = RRStateIDUnloaded;
             break;
         }
         case RREventPingCallback:
         {
             NSNumber *eventParam = event[kEventKeyParam];
-            resStateID = [FSMStateUtil RRStateFromPingFlag:[eventParam boolValue]];
+            resStateID = [RRStateUtil RRStateFromPingFlag:[eventParam boolValue]];
             break;
         }
         case RREventLocalConnectionCallback:
         {
-            resStateID = [FSMStateUtil RRStateFromValue:event[kEventKeyParam]];
+            resStateID = [RRStateUtil RRStateFromValue:event[kEventKeyParam]];
             break;
         }
         default:

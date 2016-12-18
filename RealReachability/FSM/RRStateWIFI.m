@@ -1,26 +1,37 @@
 //
-//  ReachStateUnloaded.m
+//  RRStateWIFI.m
 //  RealReachability
 //
 //  Created by Dustturtle on 16/1/19.
 //  Copyright © 2016 Dustturtle. All rights reserved.
 //
 
-#import "ReachStateUnloaded.h"
+#import "RRStateWIFI.h"
 
-@implementation ReachStateUnloaded
+@implementation RRStateWIFI
 
 - (RRStateID)onEvent:(NSDictionary *)event withError:(NSError **)error
 {
-    RRStateID resStateID = RRStateUnloaded;
+    RRStateID resStateID = RRStateIDWIFI;
     
     NSNumber *eventID = event[kEventKeyID];
     
     switch ([eventID intValue])
     {
-        case RREventLoad:
+        case RREventUnLoad:
         {
-            resStateID = RRStateLoading;
+            resStateID = RRStateIDUnloaded;
+            break;
+        }
+        case RREventPingCallback:
+        {
+            NSNumber *eventParam = event[kEventKeyParam];
+            resStateID = [RRStateUtil RRStateFromPingFlag:[eventParam boolValue]];
+            break;
+        }
+        case RREventLocalConnectionCallback:
+        {
+            resStateID = [RRStateUtil RRStateFromValue:event[kEventKeyParam]];
             break;
         }
         default:
@@ -34,5 +45,6 @@
     }
     return resStateID;
 }
+
 
 @end

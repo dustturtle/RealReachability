@@ -1,5 +1,5 @@
 //
-//  FSMStateUtil.h
+//  RRStateUtil.h
 //  RealReachability
 //
 //  Created by Dustturtle on 16/1/9.
@@ -7,9 +7,9 @@
 //
 
 #import <Foundation/Foundation.h>
-#import "FSMDefines.h"
+#import "RRDefines.h"
 
-@interface FSMStateUtil : NSObject
+@interface RRStateUtil : NSObject
 
 + (RRStateID)RRStateFromValue:(NSString *)LCEventValue;
 

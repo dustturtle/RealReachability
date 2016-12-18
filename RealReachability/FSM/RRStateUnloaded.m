@@ -1,37 +1,26 @@
 //
-//  ReachStateWWAN.m
+//  RRStateUnloaded.m
 //  RealReachability
 //
 //  Created by Dustturtle on 16/1/19.
 //  Copyright © 2016 Dustturtle. All rights reserved.
 //
 
-#import "ReachStateWWAN.h"
+#import "RRStateUnloaded.h"
 
-@implementation ReachStateWWAN
+@implementation RRStateUnloaded
 
 - (RRStateID)onEvent:(NSDictionary *)event withError:(NSError **)error
 {
-    RRStateID resStateID = RRStateWWAN;
+    RRStateID resStateID = RRStateIDUnloaded;
     
     NSNumber *eventID = event[kEventKeyID];
     
     switch ([eventID intValue])
     {
-        case RREventUnLoad:
+        case RREventLoad:
         {
-            resStateID = RRStateUnloaded;
-            break;
-        }
-        case RREventPingCallback:
-        {
-            NSNumber *eventParam = event[kEventKeyParam];
-            resStateID = [FSMStateUtil RRStateFromPingFlag:[eventParam boolValue]];
-            break;
-        }
-        case RREventLocalConnectionCallback:
-        {
-            resStateID = [FSMStateUtil RRStateFromValue:event[kEventKeyParam]];
+            resStateID = RRStateIDLoading;
             break;
         }
         default:
