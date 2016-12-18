@@ -1,14 +1,14 @@
 //
-//  ReachState.m
+//  RRState.m
 //  RealReachability
 //
 //  Created by Dustturtle on 16/1/19.
 //  Copyright © 2016 Dustturtle. All rights reserved.
 //
 
-#import "ReachState.h"
+#import "RRState.h"
 
-@implementation ReachState
+@implementation RRState
 
 + (id)state
 {
@@ -17,7 +17,7 @@
 
 - (RRStateID)onEvent:(NSDictionary *)event withError:(NSError **)error
 {
-    return RRStateInvalid;
+    return RRStateIDInvalid;
 }
 
 @end

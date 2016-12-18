@@ -1,38 +1,35 @@
 //
-//  FSMEngine.m
+//  RREngine.m
 //  RealReachability
 //
 //  Created by Dustturtle on 16/1/19.
 //  Copyright © 2016 Dustturtle. All rights reserved.
 //
 
-#import "FSMEngine.h"
-#import "ReachState.h"
-#import "ReachStateWIFI.h"
-#import "ReachStateUnloaded.h"
-#import "ReachStateWWAN.h"
-#import "ReachStateUnReachable.h"
-#import "ReachStateLoading.h"
+#import "RREngine.h"
+#import "RRState.h"
+#import "RRStateWIFI.h"
+#import "RRStateUnloaded.h"
+#import "RRStateWWAN.h"
+#import "RRStateUnReachable.h"
+#import "RRStateLoading.h"
+#import "RealReachability.h"
 
-#if (!defined(DEBUG))
-#define NSLog(...)
-#endif
-
-@interface FSMEngine()
+@interface RREngine()
 
 @property (nonatomic, assign) RRStateID currentStateID;
 @property (nonatomic, strong) NSArray *allStates;
 
 @end
 
-@implementation FSMEngine
+@implementation RREngine
 
 - (id)init
 {
     if (self = [super init])
     {
         // created only once
-        _allStates = @[[ReachStateUnloaded state], [ReachStateLoading state], [ReachStateUnReachable state], [ReachStateWIFI state], [ReachStateWWAN state]];
+        _allStates = @[[RRStateUnloaded state], [RRStateLoading state], [RRStateUnReachable state], [RRStateWIFI state], [RRStateWWAN state]];
     }
     return self;
 }
@@ -44,30 +41,31 @@
 
 - (void)start
 {
-    self.currentStateID = RRStateUnloaded;
+    self.currentStateID = RRStateIDUnloaded;
 }
 
 - (NSInteger)receiveInput:(NSDictionary *)dic
 {
     NSError *error = nil;
-    ReachState *currentState = self.allStates[self.currentStateID];
+    RRState *currentState = self.allStates[self.currentStateID];
     RRStateID newStateID = [currentState onEvent:dic withError:&error];
-    if (error)
-    {
-        NSLog(@"onEvent error:%@", error);
+    if (error) {
+		
+		if ([RealReachability loggingEnabled]) {
+			NSLog(@"onEvent error:%@", error);
+		}
     }
   
     RRStateID previousStateID = self.currentStateID;
     self.currentStateID = newStateID;
-    //NSLog(@"curStateID is %@", @(self.currentStateID));
     
     return (previousStateID == self.currentStateID) ? -1 : 0;
 }
 
 - (BOOL)isCurrentStateAvailable
 {
-    if (self.currentStateID == RRStateUnReachable || self.currentStateID == RRStateWWAN
-        || self.currentStateID == RRStateWIFI)
+    if (self.currentStateID == RRStateIDUnreachable || self.currentStateID == RRStateIDWWAN
+        || self.currentStateID == RRStateIDWIFI)
     {
         return YES;
     }

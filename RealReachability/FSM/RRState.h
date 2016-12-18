@@ -1,5 +1,5 @@
 //
-//  ReachState.h
+//  RRState.h
 //  RealReachability
 //  Only handle events here: receive event in state,then transfer current state.
 //
@@ -8,9 +8,9 @@
 //
 
 #import <Foundation/Foundation.h>
-#import "FSMStateUtil.h"
+#import "RRStateUtil.h"
 
-@interface ReachState : NSObject
+@interface RRState : NSObject
 
 /**
  *  factory method
@@ -22,7 +22,7 @@
 /**
  *  vitual method, for subclass override
  *
- *  @param event see FSMDefines.h,dictionary with keys:kEventKeyID,kEventKeyParam
+ *  @param event see RRDefines.h,dictionary with keys:kEventKeyID,kEventKeyParam
  *  @param error error pointer
  *
  *  @return return value description

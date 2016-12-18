@@ -1,25 +1,22 @@
 //
-//  LocalConnection.m
+//  RRLocalConnection.m
 //  RealReachability
 //
 //  Created by Dustturtle on 16/1/9.
 //  Copyright (c) 2016 Dustturtle. All rights reserved.
 //
 
-#import "LocalConnection.h"
+#import "RRLocalConnection.h"
 #import <netinet/in.h>
 #import <netinet6/in6.h>
 #import <arpa/inet.h>
 #import <ifaddrs.h>
+#import "RealReachability.h"
 
-#if (!defined(DEBUG))
-#define NSLog(...)
-#endif
+NSString *const kRRLocalConnectionInitializedNotification = @"kRRLocalConnectionInitializedNotification";
+NSString *const kRRLocalConnectionChangedNotification = @"kRRLocalConnectionChangedNotification";
 
-NSString *const kLocalConnectionInitializedNotification = @"kLocalConnectionInitializedNotification";
-NSString *const kLocalConnectionChangedNotification = @"kLocalConnectionChangedNotification";
-
-@interface LocalConnection ()
+@interface RRLocalConnection ()
 @property (assign, nonatomic) SCNetworkReachabilityRef reachabilityRef;
 @property (nonatomic, strong) dispatch_queue_t         reachabilitySerialQueue;
 
@@ -30,7 +27,7 @@ NSString *const kLocalConnectionChangedNotification = @"kLocalConnectionChangedN
 static void LocalConnectionCallback(SCNetworkReachabilityRef target, SCNetworkReachabilityFlags flags, void* info)
 {
 #pragma unused (target)
-    LocalConnection *connection = ((__bridge LocalConnection*)info);
+    RRLocalConnection *connection = ((__bridge RRLocalConnection*)info);
     
     @autoreleasepool
     {
@@ -52,7 +49,7 @@ static NSString *connectionFlags(SCNetworkReachabilityFlags flags)
             (flags & kSCNetworkReachabilityFlagsIsDirect)             ? 'd' : '-'];
 }
 
-@implementation LocalConnection
+@implementation RRLocalConnection
 
 #pragma mark - Life Circle
 
@@ -99,23 +96,23 @@ static NSString *connectionFlags(SCNetworkReachabilityFlags flags)
 
 #pragma mark - actions
 
-- (void)startNotifier
-{
+- (void)startNotifier {
     SCNetworkReachabilityContext context = { 0, NULL, NULL, NULL, NULL };
     context.info = (__bridge void *)self;
     
-    if(SCNetworkReachabilitySetCallback(self.reachabilityRef, LocalConnectionCallback, &context))
-    {
+    if(SCNetworkReachabilitySetCallback(self.reachabilityRef, LocalConnectionCallback, &context)) {
         // Set it as our reachability queue, which will retain the queue
-        if(!SCNetworkReachabilitySetDispatchQueue(self.reachabilityRef, self.reachabilitySerialQueue))
-        {
+        if(!SCNetworkReachabilitySetDispatchQueue(self.reachabilityRef, self.reachabilitySerialQueue)) {
             SCNetworkReachabilitySetCallback(self.reachabilityRef, NULL, NULL);
-            NSLog(@"SCNetworkReachabilitySetDispatchQueue() failed: %s", SCErrorString(SCError()));
+			if ([RealReachability loggingEnabled]) {
+				NSLog(@"SCNetworkReachabilitySetDispatchQueue() failed: %s", SCErrorString(SCError()));
+			}
         }
     }
-    else
-    {
-        NSLog(@"SCNetworkReachabilitySetCallback() failed: %s", SCErrorString(SCError()));
+    else {
+		if ([RealReachability loggingEnabled]) {
+			NSLog(@"SCNetworkReachabilitySetCallback() failed: %s", SCErrorString(SCError()));
+		}
     }
 
     // First time we come in, notify the initialization of local connection.
@@ -125,7 +122,7 @@ static NSString *connectionFlags(SCNetworkReachabilityFlags flags)
     __weak __typeof(self)weakSelf = self;
     dispatch_async(dispatch_get_main_queue(), ^{
         __strong __typeof(weakSelf)strongSelf = weakSelf;
-        [[NSNotificationCenter defaultCenter] postNotificationName:kLocalConnectionInitializedNotification
+        [[NSNotificationCenter defaultCenter] postNotificationName:kRRLocalConnectionInitializedNotification
                                                             object:strongSelf];
     });
 }
@@ -155,7 +152,7 @@ static NSString *connectionFlags(SCNetworkReachabilityFlags flags)
     }
     else
     {
-        return LC_UnReachable;
+        return LC_Unreachable;
     }
 }
 
@@ -169,7 +166,7 @@ static NSString *connectionFlags(SCNetworkReachabilityFlags flags)
     __weak __typeof(self)weakSelf = self;
     dispatch_async(dispatch_get_main_queue(), ^{
         __strong __typeof(weakSelf)strongSelf = weakSelf;
-        [[NSNotificationCenter defaultCenter] postNotificationName:kLocalConnectionChangedNotification
+        [[NSNotificationCenter defaultCenter] postNotificationName:kRRLocalConnectionChangedNotification
                                                             object:strongSelf];
     });
 }

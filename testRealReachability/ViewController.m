@@ -28,21 +28,19 @@
                                                  name:kRealReachabilityChangedNotification
                                                object:nil];
     
-    ReachabilityStatus status = [GLobalRealReachability currentReachabilityStatus];
+    ReachabilityStatus status = [[RealReachability sharedInstance] currentReachabilityStatus];
+	
     NSLog(@"Initial reachability status:%@",@(status));
     
-    if (status == RealStatusNotReachable)
-    {
+    if (status == ReachabilityStatusNotReachable) {
         self.flagLabel.text = @"Network unreachable!";
     }
     
-    if (status == RealStatusViaWiFi)
-    {
+    if (status == ReachabilityStatusViaWiFi) {
         self.flagLabel.text = @"Network wifi! Free!";
     }
     
-    if (status == RealStatusViaWWAN)
-    {
+    if (status == ReachabilityStatusWWAN) {
         self.flagLabel.text = @"Network WWAN! In charge!";
     }
     
@@ -57,10 +55,10 @@
 
 - (IBAction)testAction:(id)sender
 {
-    [GLobalRealReachability reachabilityWithBlock:^(ReachabilityStatus status) {
+    [[RealReachability sharedInstance] reachabilityWithBlock:^(ReachabilityStatus status) {
         switch (status)
         {
-            case RealStatusNotReachable:
+            case ReachabilityStatusNotReachable:
             {
                 self.alert.message = @"Nothing to do! offlineMode";
                 [self.alert show];
@@ -68,7 +66,7 @@
                 break;
             }
                 
-            case RealStatusViaWiFi:
+            case ReachabilityStatusViaWiFi:
             {
                 self.alert.message = @"Do what you want! free!";
                 [self.alert show];
@@ -76,12 +74,12 @@
                 break;
             }
                 
-            case RealStatusViaWWAN:
+            case ReachabilityStatusWWAN:
             {
                 self.alert.message = @"Take care of your money! You are in charge!";
                 [self.alert show];
                 
-                WWANAccessType accessType = [GLobalRealReachability currentWWANtype];
+                WWANAccessType accessType = [[RealReachability sharedInstance] currentWWANtype];
                 if (accessType == WWANType2G)
                 {
                     self.flagLabel.text = @"RealReachabilityStatus2G";
@@ -115,24 +113,24 @@
     ReachabilityStatus previousStatus = [reachability previousReachabilityStatus];
     NSLog(@"networkChanged, currentStatus:%@, previousStatus:%@", @(status), @(previousStatus));
     
-    if (status == RealStatusNotReachable)
+    if (status == ReachabilityStatusNotReachable)
     {
         self.flagLabel.text = @"Network unreachable!";
     }
     
-    if (status == RealStatusViaWiFi)
+    if (status == ReachabilityStatusViaWiFi)
     {
         self.flagLabel.text = @"Network wifi! Free!";
     }
     
-    if (status == RealStatusViaWWAN)
+    if (status == ReachabilityStatusWWAN)
     {
         self.flagLabel.text = @"Network WWAN! In charge!";
     }
     
-    WWANAccessType accessType = [GLobalRealReachability currentWWANtype];
+    WWANAccessType accessType = [[RealReachability sharedInstance] currentWWANtype];
     
-    if (status == RealStatusViaWWAN)
+    if (status == ReachabilityStatusWWAN)
     {
         if (accessType == WWANType2G)
         {

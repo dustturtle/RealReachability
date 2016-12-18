@@ -1,13 +1,13 @@
 //
-//  ReachStateWIFI.h
+//  RRStateUnReachable.h
 //  RealReachability
 //
 //  Created by Dustturtle on 16/1/19.
 //  Copyright © 2016 Dustturtle. All rights reserved.
 //
 
-#import "ReachState.h"
+#import "RRState.h"
 
-@interface ReachStateWIFI : ReachState
+@interface RRStateUnReachable : RRState
 
 @end

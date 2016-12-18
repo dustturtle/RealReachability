@@ -1,5 +1,5 @@
 //
-//  FSMEngine.h
+//  RREngine.h
 //  RealReachability
 //  Engine of FSM (finite state machine)
 //
@@ -8,9 +8,9 @@
 //
 
 #import <Foundation/Foundation.h>
-#import "FSMDefines.h"
+#import "RRDefines.h"
 
-@interface FSMEngine : NSObject
+@interface RREngine : NSObject
 
 @property (nonatomic, readonly) RRStateID currentStateID;
 @property (nonatomic, readonly) NSArray *allStates;

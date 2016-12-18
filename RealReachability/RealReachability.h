@@ -28,8 +28,6 @@
 
 #import <Foundation/Foundation.h>
 
-#define GLobalRealReachability [RealReachability sharedInstance]
-
 ///This notification was called only when reachability really changed;
 ///We use FSM to promise this for you;
 ///We post self to this notification, then you can invoke currentReachabilityStatus method to fetch current status.
@@ -37,10 +35,10 @@ extern NSString *const kRealReachabilityChangedNotification;
 
 typedef NS_ENUM(NSInteger, ReachabilityStatus) {
     ///Direct match with Apple networkStatus, just a force type convert.
-    RealStatusUnknown = -1,
-    RealStatusNotReachable = 0,
-    RealStatusViaWWAN = 1,
-    RealStatusViaWiFi = 2
+    ReachabilityStatusUnknown = -1,
+    ReachabilityStatusNotReachable = 0,
+    ReachabilityStatusWWAN = 1,
+    ReachabilityStatusViaWiFi = 2
 };
 
 typedef NS_ENUM(NSInteger, WWANAccessType) {
@@ -52,7 +50,12 @@ typedef NS_ENUM(NSInteger, WWANAccessType) {
 
 @interface RealReachability : NSObject
 
-/// Please make sure this host is available for pinging! default host:www.baidu.com
+// enable/disable logging (defaults to disabled)
++ (BOOL)loggingEnabled;
++ (void)setLoggingEnabled:(BOOL)enabled;
+
+
+/// Please make sure this host is available for pinging! default host:www.google.com
 @property (nonatomic, copy) NSString *hostForPing;
 
 /// Interval in minutes; default is 2.0f, suggest value from 0.3f to 60.0f;
