@@ -136,7 +136,7 @@ ReachabilityStatus status = [reachability currentReachabilityStatus];
 Once the reachabilityWithBlock was called, the "currentReachabilityStatus" will be refreshed synchronously.
 #### Set your own host for Ping (optional)
 Please make sure the host you set here is available for pinging. Large, stable website suggested.   
-This step is optional. If you do not set this, our default host is: www.apple.com.   
+This step is optional. If you do not set this, our default host is: www.baidu.com.   
 You may set your own host any time you like. Codes just like below:
 ```
 GLobalRealReachability.hostForPing = @"www.apple.com";
