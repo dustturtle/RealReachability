@@ -5,7 +5,7 @@
 [![Platform](https://img.shields.io/badge/Build-Passed-green.svg)](http://cocoadocs.org/docsets/RealReachability/1.1.8/)
 ####We need to observe the REAL reachability of network for iOS. That's what RealReachability do.
 
-#Why RealReachability?
+# Why RealReachability?
 As we know, we already have reachability framework for us to choose. Such as the famous repository [Reachability](https://github.com/tonymillion/Reachability).
 
 **BUT we really need a tool for us to get the reachability, not the local connection!**
@@ -22,7 +22,7 @@ We introduce ping module for us to check the real network status, together with 
 
 Enjoy it!
 
-#Quick Start With Cocoapods
+# Quick Start With Cocoapods
 [CocoaPods](http://cocoapods.org) is a dependency manager for Objective-C, which automates and simplifies the process of using 3rd-party libraries like RealReachability in your projects. You can install it with the following command:
 
 ```bash
@@ -61,7 +61,7 @@ RealReachability in your `Cartfile`:
 github "dustturtle/RealReachability"
 ```
 
-#Manual Start
+# Manual Start
 If you'd rather do everything by hand, just add the folder "RealReachability" to your project, then all of the files will be added to your project.
 
 
@@ -71,8 +71,8 @@ If you'd rather do everything by hand, just add the folder "RealReachability" to
   libraries. iOS 6.0+.
 - The SystemConfiguration Framework should be added to your project.
 
-#Usage
-####Start to notify(we suggest you to start notify in didFinishLaunchingWithOptions):
+# Usage
+#### Start to notify(we suggest you to start notify in didFinishLaunchingWithOptions):
 
 ```objective-c
 
@@ -81,7 +81,7 @@ If you'd rather do everything by hand, just add the folder "RealReachability" to
     return YES;
 }
 ```
-####Add Observer(anywhere you like):
+#### Add Observer(anywhere you like):
 ```objective-c
 [[NSNotificationCenter defaultCenter] addObserver:self
                                          selector:@selector(networkChanged:)
@@ -90,7 +90,7 @@ If you'd rather do everything by hand, just add the folder "RealReachability" to
 
 ```
 
-####Observer method like below:
+#### Observer method like below:
 ```objective-c
 - (void)networkChanged:(NSNotification *)notification
 {
@@ -100,7 +100,7 @@ If you'd rather do everything by hand, just add the folder "RealReachability" to
 }
 
 ```
-####Trigger realtime Reachability like below:
+#### Trigger realtime Reachability like below:
 ```objective-c
 [GLobalRealReachability reachabilityWithBlock:^(ReachabilityStatus status) {
         switch (status)
@@ -170,7 +170,7 @@ This is the only API we need to invoke about Ping:
 **More about its usage**, please see the **LocalConnection.h** or codes in [**the demo project**](https://github.com/dustturtle/RealReachability). 
 
 
-#Demo
+# Demo
 We already put the demo project in the [repository](https://github.com/dustturtle/RealReachability).
 
 # License
@@ -183,5 +183,5 @@ Please use and improve! Patches accepted, or create an issue.
 
 I'd love it if you could send me a note as to which app you're using it with! Thank you!
 
-##[中文版使用指南](http://blog.csdn.net/openglnewbee/article/details/50705146)
+## [中文版使用指南](http://blog.csdn.net/openglnewbee/article/details/50705146)
 
