@@ -22,6 +22,7 @@ NSString *const kPingResultNotification = @"kPingResultNotification";
 @property (nonatomic, strong) NSMutableArray *completionBlocks;
 @property(nonatomic, strong) PingFoundation *pingFoundation;
 @property (nonatomic, assign) BOOL isPinging;
+@property (nonatomic) NSDate *pingStartTime;
 
 @end
 
@@ -107,6 +108,7 @@ NSString *const kPingResultNotification = @"kPingResultNotification";
 - (void)startPing
 {
     //NSLog(@"startPing");
+   _pingStartTime = [NSDate date];
     [self clearPingFoundation];
     
     self.isPinging = YES;
@@ -135,6 +137,15 @@ NSString *const kPingResultNotification = @"kPingResultNotification";
 
 - (void)endWithFlag:(BOOL)isSuccess
 {
+   if (isSuccess) {
+      
+      NSTimeInterval duration = [_pingStartTime timeIntervalSinceNow];
+      _previousSuccessDuration = fabs(duration*100);
+      
+   }else{
+      _numberOfFailedPings ++;
+   }
+   
     // TODO(optimization):
     //somewhere around here we should introduce a double check after 3 seconds on another host,
     // if maybe not truely failed.
@@ -188,6 +199,10 @@ NSString *const kPingResultNotification = @"kPingResultNotification";
 - (void)pingFoundation:(PingFoundation *)pinger didReceivePingResponsePacket:(NSData *)packet sequenceNumber:(uint16_t)sequenceNumber
 {
     //NSLog(@"didReceivePingResponsePacket, sequenceNumber = %@", @(sequenceNumber));
+   
+   NSTimeInterval duration = [_pingStartTime timeIntervalSinceNow];
+   _previousSuccessDuration = duration/1000;
+   
     [self endWithFlag:YES];
 }
 
