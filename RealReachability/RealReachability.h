@@ -52,7 +52,7 @@ typedef NS_ENUM(NSInteger, WWANAccessType) {
 
 @interface RealReachability : NSObject
 
-/// Please make sure this host is available for pinging! default host:www.baidu.com
+/// Please make sure this host is available for pinging! default host:www.apple.com
 @property (nonatomic, copy) NSString *hostForPing;
 
 /// Interval in minutes; default is 2.0f, suggest value from 0.3f to 60.0f;
