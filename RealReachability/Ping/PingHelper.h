@@ -21,6 +21,9 @@ extern NSString *const kPingResultNotification;
 // Ping timeout. Default is 2 seconds
 @property (nonatomic, assign) NSTimeInterval timeout;
 
+@property (readonly) NSTimeInterval previousSuccessDuration;
+@property (readonly) int numberOfFailedPings;
+
 + (instancetype)sharedInstance;
 
 /**
