@@ -36,8 +36,6 @@ typedef NS_ENUM(NSInteger, LocalConnectionStatus)
 
 /**
  * Start observering local connection status.
- *
- *  @return success or failure. YES->success
  */
 - (void)startNotifier;
 

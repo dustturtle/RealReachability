@@ -1,8 +1,8 @@
 # RealReachability
-[![Version](https://img.shields.io/badge/pod-1.1.8-yellow.svg)](http://cocoadocs.org/docsets/RealReachability/1.1.8/)
-[![License](https://img.shields.io/badge/License-MIT-blue.svg)](http://cocoadocs.org/docsets/RealReachability/1.1.8/)
-[![Platform](https://img.shields.io/badge/Platform-iOS-orange.svg)](http://cocoadocs.org/docsets/RealReachability/1.1.8/)
-[![Platform](https://img.shields.io/badge/Build-Passed-green.svg)](http://cocoadocs.org/docsets/RealReachability/1.1.8/)
+[![Version](https://img.shields.io/badge/pod-1.1.9-yellow.svg)](http://cocoadocs.org/docsets/RealReachability/1.1.9/)
+[![License](https://img.shields.io/badge/License-MIT-blue.svg)](http://cocoadocs.org/docsets/RealReachability/1.1.9/)
+[![Platform](https://img.shields.io/badge/Platform-iOS-orange.svg)](http://cocoadocs.org/docsets/RealReachability/1.1.9/)
+[![Platform](https://img.shields.io/badge/Build-Passed-green.svg)](http://cocoadocs.org/docsets/RealReachability/1.1.9/)
 #### We need to observe the REAL reachability of network for iOS. That's what RealReachability do.
 
 # Why RealReachability?
@@ -35,7 +35,7 @@ To integrate RealReachability into your Xcode project using CocoaPods, specify i
 
 ```ruby
 source 'https://github.com/CocoaPods/Specs.git'
-platform :ios, '6.0'
+platform :ios, '7.0'
 
 pod 'RealReachability'
 ```
