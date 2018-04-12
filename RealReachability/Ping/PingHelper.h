@@ -14,10 +14,10 @@
 /// Think about that: if you never set this, we don't know where to ping.
 @property (nonatomic, copy) NSString *host;
 
-// Used as a backup for double checking.
+/// Used as a backup for double checking.
 @property (nonatomic, copy) NSString *hostForCheck;
 
-// Ping timeout. Default is 2 seconds
+/// Ping timeout. Default is 2 seconds
 @property (nonatomic, assign) NSTimeInterval timeout;
 
 /**
