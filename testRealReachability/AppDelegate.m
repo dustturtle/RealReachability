@@ -18,6 +18,8 @@
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     // Override point for customization after application launch.
+    GLobalRealReachability.hostForPing = @"www.baidu.com";
+    GLobalRealReachability.hostForCheck = @"www.apple.com";
     [GLobalRealReachability startNotifier];
     return YES;
 }
