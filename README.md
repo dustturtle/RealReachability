@@ -1,8 +1,8 @@
 # RealReachability
-[![Version](https://img.shields.io/badge/pod-1.1.9-yellow.svg)](http://cocoadocs.org/docsets/RealReachability/1.1.9/)
-[![License](https://img.shields.io/badge/License-MIT-blue.svg)](http://cocoadocs.org/docsets/RealReachability/1.1.9/)
-[![Platform](https://img.shields.io/badge/Platform-iOS-orange.svg)](http://cocoadocs.org/docsets/RealReachability/1.1.9/)
-[![Platform](https://img.shields.io/badge/Build-Passed-green.svg)](http://cocoadocs.org/docsets/RealReachability/1.1.9/)
+[![Version](https://img.shields.io/badge/pod-1.2.0-yellow.svg)](http://cocoadocs.org/docsets/RealReachability/1.2.0/)
+[![License](https://img.shields.io/badge/License-MIT-blue.svg)](http://cocoadocs.org/docsets/RealReachability/1.2.0/)
+[![Platform](https://img.shields.io/badge/Platform-iOS-orange.svg)](http://cocoadocs.org/docsets/RealReachability/1.2.0/)
+[![Platform](https://img.shields.io/badge/Build-Passed-green.svg)](http://cocoadocs.org/docsets/RealReachability/1.2.0/)
 #### We need to observe the REAL reachability of network for iOS. That's what RealReachability do.
 
 # Why RealReachability?
@@ -35,7 +35,7 @@ To integrate RealReachability into your Xcode project using CocoaPods, specify i
 
 ```ruby
 source 'https://github.com/CocoaPods/Specs.git'
-platform :ios, '7.0'
+platform :ios, '8.0'
 
 pod 'RealReachability'
 ```
@@ -135,12 +135,18 @@ ReachabilityStatus status = [reachability currentReachabilityStatus];
 
 Once the reachabilityWithBlock was called, the "currentReachabilityStatus" will be refreshed synchronously.
 #### Set your own host for Ping (optional)
+##### Note that now we introduced the new feature "doublecheck" to make the status more reliable in 1.2.0!
 Please make sure the host you set here is available for pinging. Large, stable website suggested.   
 This step is optional. If you do not set this, our default host is: www.apple.com.   
 You may set your own host any time you like. Codes just like below:
+
 ```
 GLobalRealReachability.hostForPing = @"www.apple.com";
+GLobalRealReachability.hostForCheck = @"www.youOwnHostExample.com";
 ```
+We suggest you use two hosts: one your own(if you have one available for pinging), one public; Just like the example below.
+
+For more details about the "doublecheck" feature, you can go deep into the codes.
 
 #### Get current WWAN type (optional)
 ```
