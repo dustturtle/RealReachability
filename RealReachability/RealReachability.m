@@ -188,14 +188,30 @@ NSString *const kRealReachabilityChangedNotification = @"kRealReachabilityChange
          __strong __typeof(weakSelf)strongSelf = weakSelf;
          if (isSuccess)
          {
-             // no need to post the notification because the status is not changing.
-             NSDictionary *inputDic = @{kEventKeyID:@(RREventPingCallback), kEventKeyParam:@(YES)};
-             [strongSelf.engine receiveInput:inputDic];
-            
-             if (asyncHandler != nil)
+             ReachabilityStatus status = [self currentReachabilityStatus];
+             if (status != RealStatusNotReachable && status != RealStatusUnknown) //state available & ping success
              {
-                 ReachabilityStatus currentStatus = [strongSelf currentReachabilityStatus];
-                 asyncHandler(currentStatus);
+                 NSDictionary *inputDic = @{kEventKeyID:@(RREventPingCallback), kEventKeyParam:@(YES)};
+                 NSInteger rtn = [strongSelf.engine receiveInput:inputDic];
+                 if (rtn == 0 && [strongSelf.engine isCurrentStateAvailable]) //state changed & state available, post notification.
+                 {
+                     strongSelf.previousStatus = status;
+                 }
+                 // no need to post the notification because the status is not changing.
+                 if (asyncHandler != nil)
+                 {
+                     ReachabilityStatus currentStatus = [strongSelf currentReachabilityStatus];
+                     asyncHandler(currentStatus);
+                 }
+             }else //state not available & ping success
+             {
+                 // delay 1 seconds, then make a double check is really success.
+                 dispatch_time_t time = dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1*NSEC_PER_SEC));
+                 __weak __typeof(self)weakSelf = self;
+                 dispatch_after(time, dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+                     __strong __typeof(weakSelf)self = weakSelf;
+                     [self makeDoublePingConnectCheck:true handler:asyncHandler];
+                 });
              }
          }
          else
@@ -205,7 +221,7 @@ NSString *const kRealReachabilityChangedNotification = @"kRealReachabilityChange
              __weak __typeof(self)weakSelf = self;
              dispatch_after(time, dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
                  __strong __typeof(weakSelf)self = weakSelf;
-                 [self makeDoubleCheck:asyncHandler];
+                 [self makeDoublePingConnectCheck:false handler:asyncHandler];
              });
          }
      }];
@@ -293,24 +309,27 @@ NSString *const kRealReachabilityChangedNotification = @"kRealReachabilityChange
 }
 
 #pragma mark - inner methods
-- (void)makeDoubleCheck:(void (^)(ReachabilityStatus status))asyncHandler
+- (void)makeDoublePingConnectCheck:(Boolean)connect handler:(void (^)(ReachabilityStatus status))asyncHandler
 {
     __weak __typeof(self)weakSelf = self;
     [self.pingChecker pingWithBlock:^(BOOL isSuccess) {
         __strong __typeof(weakSelf)strongSelf = weakSelf;
-        
-        NSDictionary *inputDic = @{kEventKeyID:@(RREventPingCallback), kEventKeyParam:@(isSuccess)};
-        [strongSelf.engine receiveInput:inputDic];
-        
-        if (!isSuccess)
+        if (isSuccess == connect) //double check pass
         {
-            // Only fail make the change; then we post the fail notification.
-            __weak __typeof(strongSelf)deepWeakSelf = strongSelf;
-            dispatch_async(dispatch_get_main_queue(), ^{
-                __strong __typeof(deepWeakSelf)deepStrongSelf = deepWeakSelf;
-                [[NSNotificationCenter defaultCenter] postNotificationName:kRealReachabilityChangedNotification
-                                                                    object:deepStrongSelf];
-            });
+            ReachabilityStatus status = [strongSelf currentReachabilityStatus];
+            NSDictionary *inputDic = @{kEventKeyID:@(RREventPingCallback), kEventKeyParam:@(isSuccess)};
+            NSInteger rtn = [strongSelf.engine receiveInput:inputDic];
+            if (rtn == 0 && [strongSelf.engine isCurrentStateAvailable]) // state changed & state available, post notification.
+            {
+                strongSelf.previousStatus = status;
+                //make change post notification.
+                __weak __typeof(strongSelf)deepWeakSelf = strongSelf;
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    __strong __typeof(deepWeakSelf)deepStrongSelf = deepWeakSelf;
+                    [[NSNotificationCenter defaultCenter] postNotificationName:kRealReachabilityChangedNotification
+                                                                        object:deepStrongSelf];
+                });
+            }
         }
         
         if (asyncHandler != nil)
