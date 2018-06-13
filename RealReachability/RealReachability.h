@@ -35,6 +35,8 @@
 ///We post self to this notification, then you can invoke currentReachabilityStatus method to fetch current status.
 extern NSString *const kRealReachabilityChangedNotification;
 
+extern NSString *const kRRVPNStatusChangedNotification;
+
 typedef NS_ENUM(NSInteger, ReachabilityStatus) {
     ///Direct match with Apple networkStatus, just a force type convert.
     RealStatusUnknown = -1,
@@ -54,6 +56,7 @@ typedef NS_ENUM(NSInteger, WWANAccessType) {
 @optional
 /// TODO:通过挂载一个定制的代理请求来检查网络，需要用户自己实现，我们会给出一个示例。
 /// 可以通过这种方式规避解决http可用但icmp被阻止的场景下框架判断不正确的问题。
+/// (Update: 已经添加了判断VPN的相关逻辑，以解决这种场景下大概率误判的问题)
 /// 此方法阻塞？同步返回？还是异步？如果阻塞主线程超过n秒是不行的。
 /// 当CustomAgent的doubleCheck被启用时，ping的doubleCheck将不再工作。
 /// TODO: We introduce a custom agent to check the network by making http request, that need
@@ -116,5 +119,11 @@ typedef NS_ENUM(NSInteger, WWANAccessType) {
  *  (different strategies for different WWAN types).
  */
 - (WWANAccessType)currentWWANtype;
+
+// Sometimes people use VPN on the device.
+// In this situation we need to ignore the ping error.(VPN usually do not support ICMP.)
+// 目前内部使用轮询来实现，并没有监听，如果谁知道如何监听，请告诉我:)。
+//
+- (BOOL)isVPNOn;
 
 @end

@@ -13,6 +13,7 @@
 		8EE0B63C1C40F71900CBABCA /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 8EE0B63A1C40F71900CBABCA /* Main.storyboard */; };
 		8EE0B63E1C40F71900CBABCA /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 8EE0B63D1C40F71900CBABCA /* Assets.xcassets */; };
 		8EE0B6411C40F71900CBABCA /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 8EE0B63F1C40F71900CBABCA /* LaunchScreen.storyboard */; };
+		8EF6153420CFEDD100D425CD /* NSObject+SimpleKVO.m in Sources */ = {isa = PBXBuildFile; fileRef = 8EF6153320CFEDD100D425CD /* NSObject+SimpleKVO.m */; };
 		8EFA08DA1C50E25800F6D790 /* LocalConnection.m in Sources */ = {isa = PBXBuildFile; fileRef = 8EFA08C01C50E25800F6D790 /* LocalConnection.m */; };
 		8EFA08DB1C50E25800F6D790 /* FSMEngine.m in Sources */ = {isa = PBXBuildFile; fileRef = 8EFA08C41C50E25800F6D790 /* FSMEngine.m */; };
 		8EFA08DC1C50E25800F6D790 /* FSMStateUtil.m in Sources */ = {isa = PBXBuildFile; fileRef = 8EFA08C61C50E25800F6D790 /* FSMStateUtil.m */; };
@@ -38,6 +39,8 @@
 		8EE0B63D1C40F71900CBABCA /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		8EE0B6401C40F71900CBABCA /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		8EE0B6421C40F71900CBABCA /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		8EF6153220CFEDD100D425CD /* NSObject+SimpleKVO.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSObject+SimpleKVO.h"; sourceTree = "<group>"; };
+		8EF6153320CFEDD100D425CD /* NSObject+SimpleKVO.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSObject+SimpleKVO.m"; sourceTree = "<group>"; };
 		8EFA08BF1C50E25800F6D790 /* LocalConnection.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LocalConnection.h; sourceTree = "<group>"; };
 		8EFA08C01C50E25800F6D790 /* LocalConnection.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LocalConnection.m; sourceTree = "<group>"; };
 		8EFA08C21C50E25800F6D790 /* FSMDefines.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FSMDefines.h; sourceTree = "<group>"; };
@@ -95,6 +98,7 @@
 		8EE0B6301C40F71900CBABCA /* testRealReachability */ = {
 			isa = PBXGroup;
 			children = (
+				8EF6153120CFEDD100D425CD /* KVO */,
 				8EFA08BD1C50E25800F6D790 /* RealReachability */,
 				8EE0B6341C40F71900CBABCA /* AppDelegate.h */,
 				8EE0B6351C40F71900CBABCA /* AppDelegate.m */,
@@ -115,6 +119,15 @@
 				8EE0B6321C40F71900CBABCA /* main.m */,
 			);
 			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+		8EF6153120CFEDD100D425CD /* KVO */ = {
+			isa = PBXGroup;
+			children = (
+				8EF6153220CFEDD100D425CD /* NSObject+SimpleKVO.h */,
+				8EF6153320CFEDD100D425CD /* NSObject+SimpleKVO.m */,
+			);
+			path = KVO;
 			sourceTree = "<group>";
 		};
 		8EFA08BD1C50E25800F6D790 /* RealReachability */ = {
@@ -204,6 +217,7 @@
 				TargetAttributes = {
 					8EE0B62D1C40F71800CBABCA = {
 						CreatedOnToolsVersion = 7.1.1;
+						DevelopmentTeam = K93K8C6UUM;
 					};
 				};
 			};
@@ -255,6 +269,7 @@
 				8EFA08DC1C50E25800F6D790 /* FSMStateUtil.m in Sources */,
 				8EFA08DB1C50E25800F6D790 /* FSMEngine.m in Sources */,
 				8EFA08E21C50E25800F6D790 /* ReachStateWWAN.m in Sources */,
+				8EF6153420CFEDD100D425CD /* NSObject+SimpleKVO.m in Sources */,
 				8EFA08E01C50E25800F6D790 /* ReachStateUnReachable.m in Sources */,
 				8EFA08E11C50E25800F6D790 /* ReachStateWIFI.m in Sources */,
 				8EFA08DF1C50E25800F6D790 /* ReachStateUnloaded.m in Sources */,
@@ -367,6 +382,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				DEVELOPMENT_TEAM = K93K8C6UUM;
 				INFOPLIST_FILE = testRealReachability/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
@@ -379,6 +395,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				DEVELOPMENT_TEAM = K93K8C6UUM;
 				INFOPLIST_FILE = testRealReachability/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";

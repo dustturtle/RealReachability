@@ -6,6 +6,8 @@
 //  Copyright © 2016 Dustturtle. All rights reserved.
 //
 
+#include <ifaddrs.h>
+
 #import "RealReachability.h"
 #import "FSMEngine.h"
 #import "LocalConnection.h"
@@ -26,7 +28,13 @@
 
 NSString *const kRealReachabilityChangedNotification = @"kRealReachabilityChangedNotification";
 
+NSString *const kRRVPNStatusChangedNotification = @"kRRVPNStatusChangedNotification";
+
 @interface RealReachability()
+{
+    BOOL _vpnFlag;
+}
+
 @property (nonatomic, strong) FSMEngine *engine;
 @property (nonatomic, assign) BOOL isNotifying;
 
@@ -41,6 +49,7 @@ NSString *const kRealReachabilityChangedNotification = @"kRealReachabilityChange
 
 /// for double check
 @property (nonatomic, strong) PingHelper *pingChecker;
+
 @end
 
 @implementation RealReachability
@@ -72,6 +81,8 @@ NSString *const kRealReachabilityChangedNotification = @"kRealReachabilityChange
         _hostForCheck = kDefaultHost;
         _autoCheckInterval = kDefaultCheckInterval;
         _pingTimeout = kDefaultPingTimeout;
+        
+        _vpnFlag = NO;
         
         [[NSNotificationCenter defaultCenter] addObserver:self
                                                  selector:@selector(appBecomeActive)
@@ -182,6 +193,17 @@ NSString *const kRealReachabilityChangedNotification = @"kRealReachabilityChange
         return;
     }
     
+    // special case, VPN on; just skipping (ICMP not working now).
+    if ([self isVPNOn])
+    {
+        ReachabilityStatus status = [self currentReachabilityStatus];
+        if (asyncHandler != nil)
+        {
+            asyncHandler(status);
+        }
+        return;
+    }
+    
     __weak __typeof(self)weakSelf = self;
     [self.pingHelper pingWithBlock:^(BOOL isSuccess)
      {
@@ -215,13 +237,20 @@ NSString *const kRealReachabilityChangedNotification = @"kRealReachabilityChange
          }
          else
          {
-             // delay 1 seconds, then make a double check.
-             dispatch_time_t time = dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1*NSEC_PER_SEC));
-             __weak __typeof(self)weakSelf = self;
-             dispatch_after(time, dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-                 __strong __typeof(weakSelf)self = weakSelf;
-                 [self makeDoubleCheck:asyncHandler];
-             });
+             if ([self isVPNOn])
+             {
+                 // special case, VPN connected. Just ignore the ping result.
+             }
+             else
+             {
+                 // delay 1 seconds, then make a double check.
+                 dispatch_time_t time = dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1*NSEC_PER_SEC));
+                 __weak __typeof(self)weakSelf = self;
+                 dispatch_after(time, dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+                     __strong __typeof(weakSelf)self = weakSelf;
+                     [self makeDoubleCheck:asyncHandler];
+                 });
+             }
          }
      }];
 }
@@ -290,7 +319,7 @@ NSString *const kRealReachabilityChangedNotification = @"kRealReachabilityChange
 {
     if ([[[UIDevice currentDevice] systemVersion] floatValue] >= 7.0)
     {
-        CTTelephonyNetworkInfo *teleInfo= [[CTTelephonyNetworkInfo alloc] init];
+        CTTelephonyNetworkInfo *teleInfo = [[CTTelephonyNetworkInfo alloc] init];
         NSString *accessString = teleInfo.currentRadioAccessTechnology;
         if ([accessString length] > 0)
         {
@@ -443,6 +472,76 @@ NSString *const kRealReachabilityChangedNotification = @"kRealReachabilityChange
             }
         }
     }
+}
+
+// TODO: 这里比较特别；最终决定采用提供一个外部调用方法；不提供kvo；整合应用内部的状态变化的通知提供到外部。
+// 这样一个综合的策略来实现。 kvo不适合用在这里，只有get方法会操作数据(没有真正意义上的set)。
+// 而如果获取用一个方法，而kvo又是另外一个的话又会很怪异.
+- (BOOL)isVPNOn
+{
+    BOOL flag = NO;
+    NSString *version = [UIDevice currentDevice].systemVersion;
+    // need two ways to judge this.
+    if (version.doubleValue >= 9.0)
+    {
+        NSDictionary *dict = CFBridgingRelease(CFNetworkCopySystemProxySettings());
+        NSArray *keys = [dict[@"__SCOPED__"] allKeys];
+        for (NSString *key in keys) {
+            if ([key rangeOfString:@"tap"].location != NSNotFound ||
+                [key rangeOfString:@"tun"].location != NSNotFound ||
+                [key rangeOfString:@"ipsec"].location != NSNotFound ||
+                [key rangeOfString:@"ppp"].location != NSNotFound){
+                flag = YES;
+                break;
+            }
+        }
+    }
+    else
+    {
+        struct ifaddrs *interfaces = NULL;
+        struct ifaddrs *temp_addr = NULL;
+        int success = 0;
+        
+        // retrieve the current interfaces - returns 0 on success
+        success = getifaddrs(&interfaces);
+        if (success == 0)
+        {
+            // Loop through linked list of interfaces
+            temp_addr = interfaces;
+            while (temp_addr != NULL)
+            {
+                NSString *string = [NSString stringWithFormat:@"%s" , temp_addr->ifa_name];
+                if ([string rangeOfString:@"tap"].location != NSNotFound ||
+                    [string rangeOfString:@"tun"].location != NSNotFound ||
+                    [string rangeOfString:@"ipsec"].location != NSNotFound ||
+                    [string rangeOfString:@"ppp"].location != NSNotFound)
+                {
+                    flag = YES;
+                    break;
+                }
+                temp_addr = temp_addr->ifa_next;
+            }
+        }
+        
+        // Free memory
+        freeifaddrs(interfaces);
+    }
+    
+    if (_vpnFlag != flag)
+    {
+        // reset flag
+        _vpnFlag = flag;
+        
+        // post notification
+        __weak __typeof(self)weakSelf = self;
+        dispatch_async(dispatch_get_main_queue(), ^{
+            __strong __typeof(weakSelf)strongSelf = weakSelf;
+            [[NSNotificationCenter defaultCenter] postNotificationName:kRRVPNStatusChangedNotification
+                                                                object:strongSelf];
+        });
+    }
+    
+    return flag;
 }
 
 @end

@@ -8,6 +8,7 @@
 
 #import "ViewController.h"
 #import "RealReachability.h"
+#import "NSObject+SimpleKVO.h"
 
 @interface ViewController ()
 
@@ -28,23 +29,17 @@
                                                  name:kRealReachabilityChangedNotification
                                                object:nil];
     
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(VPNStatusChanged:)
+                                                 name:kRRVPNStatusChangedNotification
+                                               object:nil];
+    
     ReachabilityStatus status = [GLobalRealReachability currentReachabilityStatus];
     NSLog(@"Initial reachability status:%@",@(status));
     
-    if (status == RealStatusNotReachable)
-    {
-        self.flagLabel.text = @"Network unreachable!";
-    }
-    
-    if (status == RealStatusViaWiFi)
-    {
-        self.flagLabel.text = @"Network wifi! Free!";
-    }
-    
-    if (status == RealStatusViaWWAN)
-    {
-        self.flagLabel.text = @"Network WWAN! In charge!";
-    }
+    [self setupFlagLabelWithStatus:status
+                           isVPNOn:[GLobalRealReachability isVPNOn]
+                        accessType:[GLobalRealReachability currentWWANtype]];
     
     self.alert = [[UIAlertView alloc] initWithTitle:@"RealReachability" message:@"" delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil, nil];
 }
@@ -54,9 +49,16 @@
     [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 
-
 - (IBAction)testAction:(id)sender
 {
+//    NSLog(@"begin");
+//    // performance test of this method; ok.
+//    for (NSInteger i=0; i<10000; i++)
+//    {
+//        [GLobalRealReachability isVPNOn];
+//    }
+//    NSLog(@"end");
+    
     [GLobalRealReachability reachabilityWithBlock:^(ReachabilityStatus status) {
         switch (status)
         {
@@ -79,32 +81,17 @@
             case RealStatusViaWWAN:
             {
                 self.alert.message = @"Take care of your money! You are in charge!";
-                [self.alert show];
-                
-                WWANAccessType accessType = [GLobalRealReachability currentWWANtype];
-                if (accessType == WWANType2G)
-                {
-                    self.flagLabel.text = @"RealReachabilityStatus2G";
-                }
-                else if (accessType == WWANType3G)
-                {
-                    self.flagLabel.text = @"RealReachabilityStatus3G";
-                }
-                else if (accessType == WWANType4G)
-                {
-                    self.flagLabel.text = @"RealReachabilityStatus4G";
-                }
-                else
-                {
-                    self.flagLabel.text = @"Unknown RealReachability WWAN Status, might be iOS6";
-                }
-                
                 break;
             }
                 
             default:
+            {
+                self.alert.message = @"Error status, needs debugging!";
                 break;
+            }
         }
+        
+        [self.alert show];
     }];
 }
 
@@ -115,42 +102,87 @@
     ReachabilityStatus previousStatus = [reachability previousReachabilityStatus];
     NSLog(@"networkChanged, currentStatus:%@, previousStatus:%@", @(status), @(previousStatus));
     
-    if (status == RealStatusNotReachable)
+    [self setupFlagLabelWithStatus:status
+                           isVPNOn:[GLobalRealReachability isVPNOn]
+                        accessType:[GLobalRealReachability currentWWANtype]];
+}
+
+- (void)VPNStatusChanged:(NSNotification *)notification
+{
+    // refreshing the status.
+    [self setupFlagLabelWithStatus:[GLobalRealReachability currentReachabilityStatus]
+                           isVPNOn:[GLobalRealReachability isVPNOn]
+                        accessType:[GLobalRealReachability currentWWANtype]];
+}
+
+- (void)setupFlagLabelWithStatus:(ReachabilityStatus)status
+                         isVPNOn:(BOOL)isVPNOn
+                      accessType:(WWANAccessType)accessType
+{
+    NSMutableString *labelStr = [@"" mutableCopy];
+    
+    switch (status)
     {
-        self.flagLabel.text = @"Network unreachable!";
+        case RealStatusNotReachable:
+        {
+            [labelStr appendString:@"Network unreachable! "];
+            break;
+        }
+            
+        case RealStatusViaWiFi:
+        {
+            [labelStr appendString:@"Network wifi! Free! "];
+            break;
+        }
+            
+        case RealStatusViaWWAN:
+        {
+            [labelStr appendString:@"WWAN in charge! "];
+            break;
+        }
+            
+        case RealStatusUnknown:
+        {
+            [labelStr appendString:@"Unknown status! Needs debugging! "];
+            break;
+        }
+            
+        default:
+        {
+            [labelStr appendString:@"Status error! Needs debugging! "];
+            break;
+        }
     }
     
-    if (status == RealStatusViaWiFi)
+    if (isVPNOn)
     {
-        self.flagLabel.text = @"Network wifi! Free!";
+        [labelStr appendString:@"VPN On! "];
     }
     
     if (status == RealStatusViaWWAN)
     {
-        self.flagLabel.text = @"Network WWAN! In charge!";
-    }
-    
-    WWANAccessType accessType = [GLobalRealReachability currentWWANtype];
-    
-    if (status == RealStatusViaWWAN)
-    {
+        NSString *descStr;
         if (accessType == WWANType2G)
         {
-            self.flagLabel.text = @"RealReachabilityStatus2G";
+            descStr = @"2G";
         }
         else if (accessType == WWANType3G)
         {
-            self.flagLabel.text = @"RealReachabilityStatus3G";
+            descStr = @"3G";
         }
         else if (accessType == WWANType4G)
         {
-            self.flagLabel.text = @"RealReachabilityStatus4G";
+            descStr = @"4G";
         }
         else
         {
-            self.flagLabel.text = @"Unknown RealReachability WWAN Status, might be iOS6";
+            descStr = @"Unknown Status, might be iOS6";
         }
+
+        [labelStr appendString:descStr];
     }
+    
+    self.flagLabel.text = [labelStr copy];
 }
 
 @end
