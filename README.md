@@ -1,8 +1,8 @@
 # RealReachability
-[![Version](https://img.shields.io/badge/pod-1.2.2-yellow.svg)](http://cocoadocs.org/docsets/RealReachability/1.2.2/)
-[![License](https://img.shields.io/badge/License-MIT-blue.svg)](http://cocoadocs.org/docsets/RealReachability/1.2.2/)
-[![Platform](https://img.shields.io/badge/Platform-iOS-orange.svg)](http://cocoadocs.org/docsets/RealReachability/1.2.2/)
-[![Platform](https://img.shields.io/badge/Build-Passed-green.svg)](http://cocoadocs.org/docsets/RealReachability/1.2.2/)
+[![Version](https://img.shields.io/badge/pod-1.3.0-yellow.svg)](http://cocoadocs.org/docsets/RealReachability/1.3.0/)
+[![License](https://img.shields.io/badge/License-MIT-blue.svg)](http://cocoadocs.org/docsets/RealReachability/1.3.0)
+[![Platform](https://img.shields.io/badge/Platform-iOS-orange.svg)](http://cocoadocs.org/docsets/RealReachability/1.3.0/)
+[![Platform](https://img.shields.io/badge/Build-Passed-green.svg)](http://cocoadocs.org/docsets/RealReachability/1.3.0/)
 #### We need to observe the REAL reachability of network for iOS. That's what RealReachability do.
 
 # Why RealReachability?
@@ -154,6 +154,11 @@ For more details about the "doublecheck" feature, you can go deep into the codes
 
 ```
 Current WWAN type might be used to improve your app's user experience(e.g, set different network request timeout interval for different WWAN type).
+#### Check the VPN status of your network
+```
+- (BOOL)isVPNOn;
+```
+With the help of this method, we have improved our reachability check logic when using VPN.
 #### More:
 We can also use PingHelper or LocalConnection alone to make a ping action or just observe the local connection.  
 Pod usage like blow (we have two pod subspecs):
