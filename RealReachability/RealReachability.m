@@ -474,9 +474,6 @@ NSString *const kRRVPNStatusChangedNotification = @"kRRVPNStatusChangedNotificat
     }
 }
 
-// TODO: 这里比较特别；最终决定采用提供一个外部调用方法；不提供kvo；整合应用内部的状态变化的通知提供到外部。
-// 这样一个综合的策略来实现。 kvo不适合用在这里，只有get方法会操作数据(没有真正意义上的set)。
-// 而如果获取用一个方法，而kvo又是另外一个的话又会很怪异.
 - (BOOL)isVPNOn
 {
     BOOL flag = NO;

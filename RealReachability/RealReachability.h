@@ -1,6 +1,6 @@
 //
 //  RealReachability.h
-//  Version 1.1.9
+//  Version 1.3.0
 //
 //  Created by Dustturtle on 16/1/9.
 //  Copyright (c) 2016 Dustturtle. All rights reserved.
@@ -120,10 +120,16 @@ typedef NS_ENUM(NSInteger, WWANAccessType) {
  */
 - (WWANAccessType)currentWWANtype;
 
-// Sometimes people use VPN on the device.
-// In this situation we need to ignore the ping error.(VPN usually do not support ICMP.)
-// 目前内部使用轮询来实现，并没有监听，如果谁知道如何监听，请告诉我:)。
-//
+/**
+ *  Sometimes people use VPN on the device.
+ *  In this situation we need to ignore the ping error.
+ *  (VPN usually do not support ICMP.)
+ *
+ *  @return current VPN status: YES->ON, NO->OFF.
+ *
+ *  This method can be used to improve app's further network performance
+ *  (different strategies for different WWAN types).
+ */
 - (BOOL)isVPNOn;
 
 @end
