@@ -164,6 +164,12 @@ NSString *const kRRVPNStatusChangedNotification = @"kRRVPNStatusChangedNotificat
 
 - (void)stopNotifier
 {
+    if (!self.isNotifying)
+    {
+        // avoid duplicate action
+        return;
+    }
+    
     [[NSNotificationCenter defaultCenter] removeObserver:self
                                                     name:kLocalConnectionChangedNotification
                                                   object:nil];

@@ -22,6 +22,7 @@ NSString *const kLocalConnectionChangedNotification = @"kLocalConnectionChangedN
 @interface LocalConnection ()
 @property (assign, nonatomic) SCNetworkReachabilityRef reachabilityRef;
 @property (nonatomic, strong) dispatch_queue_t         reachabilitySerialQueue;
+@property (nonatomic, assign) BOOL isNotifying;
 
 -(void)localConnectionChanged;
 @end
@@ -101,6 +102,13 @@ static NSString *connectionFlags(SCNetworkReachabilityFlags flags)
 
 - (void)startNotifier
 {
+    if (self.isNotifying)
+    {
+        return;
+    }
+    
+    self.isNotifying = YES;
+    
     SCNetworkReachabilityContext context = { 0, NULL, NULL, NULL, NULL };
     context.info = (__bridge void *)self;
     
@@ -132,6 +140,13 @@ static NSString *connectionFlags(SCNetworkReachabilityFlags flags)
 
 -(void)stopNotifier
 {
+    if (!self.isNotifying)
+    {
+        return;
+    }
+    
+    self.isNotifying = NO;
+    
     // First: stop any callbacks.
     SCNetworkReachabilitySetCallback(self.reachabilityRef, NULL, NULL);
     
