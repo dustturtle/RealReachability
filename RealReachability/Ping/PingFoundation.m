@@ -627,6 +627,7 @@ static void SocketReadCallback(CFSocketRef s, CFSocketCallBackType type, CFDataR
     fd = -1;
     err = 0;
     switch (self.hostAddressFamily) {
+            // gzw here to decide what to use! see what is going on in iOS12! TODO:
         case AF_INET: {
             fd = socket(AF_INET, SOCK_DGRAM, IPPROTO_ICMP);
             if (fd < 0) {

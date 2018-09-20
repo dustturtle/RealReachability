@@ -118,13 +118,13 @@ NSString *const kRRVPNStatusChangedNotification = @"kRRVPNStatusChangedNotificat
 
 + (instancetype)sharedInstance
 {
-    static id localConnection = nil;
+    static id sharedRRInstance = nil;
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
-        localConnection = [[self alloc] init];
+        sharedRRInstance = [[self alloc] init];
     });
     
-    return localConnection;
+    return sharedRRInstance;
 }
 
 #pragma mark - actions
