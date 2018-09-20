@@ -7,7 +7,7 @@
 //
 
 #import "FSMStateUtil.h"
-#import "LocalConnection.h"
+#import "RealReachability.h"
 
 @implementation FSMStateUtil
 
@@ -34,7 +34,7 @@
 
 + (RRStateID)RRStateFromPingFlag:(BOOL)isSuccess
 {
-    LocalConnectionStatus status = GLocalConnection.currentLocalConnectionStatus;
+    LocalConnectionStatus status = GLobalRealReachability.localObserver.currentLocalConnectionStatus;
     
     if (!isSuccess)
     {

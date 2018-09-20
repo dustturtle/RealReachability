@@ -9,8 +9,6 @@
 #import <Foundation/Foundation.h>
 #import <SystemConfiguration/SystemConfiguration.h>
 
-#define GLocalConnection [LocalConnection sharedInstance]
-
 /// We post self to this notification,
 /// then you should invoke currentLocalConnectionStatus method to fetch current status.
 extern NSString *const kLocalConnectionChangedNotification;
@@ -31,8 +29,6 @@ typedef NS_ENUM(NSInteger, LocalConnectionStatus)
 /// Newly added property for KVO usage:
 /// maybe you only want to observe the local network is available or not.
 @property (nonatomic, assign) BOOL isReachable;
-
-+ (instancetype)sharedInstance;
 
 /**
  * Start observering local connection status.

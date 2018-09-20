@@ -27,6 +27,7 @@
 //
 
 #import <Foundation/Foundation.h>
+#import "LocalConnection.h"
 
 #define GLobalRealReachability [RealReachability sharedInstance]
 
@@ -67,6 +68,9 @@ typedef NS_ENUM(NSInteger, WWANAccessType) {
 @end
 
 @interface RealReachability : NSObject
+
+// local connection observer
+@property (nonatomic, strong) LocalConnection *localObserver;
 
 /// Please make sure this host is available for pinging! default host:www.apple.com
 @property (nonatomic, copy) NSString *hostForPing;

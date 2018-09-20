@@ -10,7 +10,6 @@
 
 #import "RealReachability.h"
 #import "FSMEngine.h"
-#import "LocalConnection.h"
 #import "PingHelper.h"
 #import <UIKit/UIKit.h>
 #import <CoreTelephony/CTTelephonyNetworkInfo.h>
@@ -89,6 +88,7 @@ NSString *const kRRVPNStatusChangedNotification = @"kRRVPNStatusChangedNotificat
                                                      name:UIApplicationDidBecomeActiveNotification
                                                    object:nil];
         
+        _localObserver = [[LocalConnection alloc] init];
         _pingHelper = [[PingHelper alloc] init];
         _pingChecker = [[PingHelper alloc] init];
     }
@@ -101,7 +101,8 @@ NSString *const kRRVPNStatusChangedNotification = @"kRRVPNStatusChangedNotificat
     
     self.engine = nil;
     
-    [GLocalConnection stopNotifier];
+    [self.localObserver stopNotifier];
+    _localObserver = nil;
 }
 
 #pragma mark - Handle system event
@@ -143,7 +144,7 @@ NSString *const kRRVPNStatusChangedNotification = @"kRRVPNStatusChangedNotificat
     NSDictionary *inputDic = @{kEventKeyID:@(RREventLoad)};
     [self.engine receiveInput:inputDic];
     
-    [GLocalConnection startNotifier];
+    [self.localObserver startNotifier];
     [[NSNotificationCenter defaultCenter] addObserver:self
                                              selector:@selector(localConnectionHandler:)
                                                  name:kLocalConnectionChangedNotification
@@ -180,7 +181,7 @@ NSString *const kRRVPNStatusChangedNotification = @"kRRVPNStatusChangedNotificat
     NSDictionary *inputDic = @{kEventKeyID:@(RREventUnLoad)};
     [self.engine receiveInput:inputDic];
     
-    [GLocalConnection stopNotifier];
+    [self.localObserver stopNotifier];
     
     self.isNotifying = NO;
 }
@@ -190,7 +191,7 @@ NSString *const kRRVPNStatusChangedNotification = @"kRRVPNStatusChangedNotificat
 - (void)reachabilityWithBlock:(void (^)(ReachabilityStatus status))asyncHandler
 {
     // logic optimization: no need to ping when Local connection unavailable!
-    if ([GLocalConnection currentLocalConnectionStatus] == LC_UnReachable)
+    if ([self.localObserver currentLocalConnectionStatus] == LC_UnReachable)
     {
         if (asyncHandler != nil)
         {
@@ -282,7 +283,7 @@ NSString *const kRRVPNStatusChangedNotification = @"kRRVPNStatusChangedNotificat
         case RRStateLoading:
         {
             // status on loading, return local status temporary.
-            return (ReachabilityStatus)(GLocalConnection.currentLocalConnectionStatus);
+            return (ReachabilityStatus)(self.localObserver.currentLocalConnectionStatus);
         }
             
         default:
