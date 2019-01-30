@@ -84,6 +84,9 @@ typedef NS_ENUM(NSInteger, WWANAccessType) {
 // Timeout used for ping. Default is 2 seconds
 @property (nonatomic, assign) NSTimeInterval pingTimeout;
 
+// Timeout used for check. Default is 5 seconds
+@property (nonatomic, assign) NSTimeInterval checkTimeout;
+
 + (instancetype)sharedInstance;
 
 - (void)startNotifier;

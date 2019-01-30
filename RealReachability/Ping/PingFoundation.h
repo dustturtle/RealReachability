@@ -69,6 +69,8 @@ typedef NS_ENUM(NSInteger, PingFoundationAddressStyle) {
     PingFoundationAddressStyleICMPv6        ///< Use the first IPv6 address found.
 };
 
+extern const uint16_t HttpModeSequenceNumber;
+
 @interface PingFoundation : NSObject
 
 - (instancetype)init NS_UNAVAILABLE;
@@ -79,7 +81,7 @@ typedef NS_ENUM(NSInteger, PingFoundationAddressStyle) {
  *  \returns The initialised object.
  */
 
-- (instancetype)initWithHostName:(NSString *)hostName NS_DESIGNATED_INITIALIZER;
+- (instancetype)initWithHostName:(NSString *)hostName withHttpMode:(BOOL)httpMode NS_DESIGNATED_INITIALIZER;
 
 /*! A copy of the value passed to `-initWithHostName:`.
  */
@@ -98,6 +100,8 @@ typedef NS_ENUM(NSInteger, PingFoundationAddressStyle) {
  */
 
 @property (nonatomic, assign, readwrite) PingFoundationAddressStyle addressStyle;
+
+@property (nonatomic, assign, readwrite) BOOL httpMode;
 
 /*! The address being pinged.
  *  \details The contents of the NSData is a (struct sockaddr) of some form.  The
@@ -128,6 +132,8 @@ typedef NS_ENUM(NSInteger, PingFoundationAddressStyle) {
 
 @property (nonatomic, assign, readonly) uint16_t nextSequenceNumber;
 
+- (void)setHttpMode:(BOOL)httpMode;
+
 - (void)start;
 // Starts the pinger object pinging.  You should call this after
 // you've setup the delegate and any ping parameters.
@@ -139,6 +145,8 @@ typedef NS_ENUM(NSInteger, PingFoundationAddressStyle) {
 //
 // Do not try to send a ping before you receive the -PingFoundation:didStartWithAddress: delegate
 // callback.
+
+-(void)sendHttpPingWithData:(NSString *)method path:(NSString *)path;
 
 - (void)stop;
 // Stops the pinger object.  You should call this when you're done
@@ -161,7 +169,7 @@ typedef NS_ENUM(NSInteger, PingFoundationAddressStyle) {
  *      is made, this will have the same value as the `hostAddress` property.
  */
 
-- (void)pingFoundation:(PingFoundation *)pinger didStartWithAddress:(NSData *)address;
+- (void)pingFoundation:(PingFoundation *)pinger didStartWithAddress:(NSData *)address httpMode:(BOOL)httpMode;
 
 /*! A PingFoundation delegate callback, called if the object fails to start up.
  *  \details This is called shortly after you start the object to tell you that the

@@ -20,6 +20,8 @@
 /// Ping timeout. Default is 2 seconds
 @property (nonatomic, assign) NSTimeInterval timeout;
 
+@property (nonatomic, assign) BOOL httpMode;
+
 /**
  *  trigger a ping action with a completion block
  *
