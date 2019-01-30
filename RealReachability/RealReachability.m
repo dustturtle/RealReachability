@@ -22,6 +22,8 @@
 #define kDefaultCheckInterval 2.0f
 #define kDefaultPingTimeout 2.0f
 
+#define kDefaultCheckTimeout 5.0f
+
 #define kMinAutoCheckInterval 0.3f
 #define kMaxAutoCheckInterval 60.0f
 
@@ -80,6 +82,7 @@ NSString *const kRRVPNStatusChangedNotification = @"kRRVPNStatusChangedNotificat
         _hostForCheck = kDefaultHost;
         _autoCheckInterval = kDefaultCheckInterval;
         _pingTimeout = kDefaultPingTimeout;
+        _checkTimeout = kDefaultCheckTimeout;
         
         _vpnFlag = NO;
         
@@ -158,7 +161,10 @@ NSString *const kRRVPNStatusChangedNotification = @"kRRVPNStatusChangedNotificat
     self.pingHelper.timeout = self.pingTimeout;
     
     self.pingChecker.host = _hostForCheck;
-    self.pingChecker.timeout = self.pingTimeout;
+    self.pingChecker.timeout = self.checkTimeout;
+    
+    // 默认DoubleCheck的时候开启Http模式。
+    [self.pingChecker setHttpMode:TRUE];
     
     [self autoCheckReachability];
 }
@@ -315,11 +321,12 @@ NSString *const kRRVPNStatusChangedNotification = @"kRRVPNStatusChangedNotificat
     self.pingChecker.host = _hostForCheck;
 }
 
-- (void)setPingTimeout:(NSTimeInterval)pingTimeout
+- (void)setPingTimeout:(NSTimeInterval)pingTimeout withCheckTimeout:(NSTimeInterval)checkTimeout
 {
     _pingTimeout = pingTimeout;
+    _checkTimeout = checkTimeout;
     self.pingHelper.timeout = pingTimeout;
-    self.pingChecker.timeout = pingTimeout;
+    self.pingChecker.timeout = checkTimeout;
 }
 
 - (WWANAccessType)currentWWANtype

@@ -94,7 +94,7 @@
     
     self.isPinging = YES;
     
-    self.pingFoundation = [[PingFoundation alloc] initWithHostName:self.host];
+    self.pingFoundation = [[PingFoundation alloc] initWithHostName:self.host withHttpMode:self.httpMode];
     self.pingFoundation.delegate = self;
     [self.pingFoundation start];
     
@@ -109,7 +109,7 @@
     self.pingFoundation.delegate = nil;
     self.pingFoundation = nil;
     
-    self.pingFoundation = [[PingFoundation alloc] initWithHostName:_host];
+    self.pingFoundation = [[PingFoundation alloc] initWithHostName:_host withHttpMode:self.httpMode];
     
     self.pingFoundation.delegate = self;
 }
@@ -122,7 +122,7 @@
     
     self.isPinging = YES;
     
-    self.pingFoundation = [[PingFoundation alloc] initWithHostName:self.hostForCheck];
+    self.pingFoundation = [[PingFoundation alloc] initWithHostName:self.hostForCheck withHttpMode:self.httpMode];
     self.pingFoundation.delegate = self;
     [self.pingFoundation start];
     
@@ -153,10 +153,14 @@
 #pragma mark - PingFoundation delegate
 
 // When the pinger starts, send the ping immediately
-- (void)pingFoundation:(PingFoundation *)pinger didStartWithAddress:(NSData *)address
+- (void)pingFoundation:(PingFoundation *)pinger didStartWithAddress:(NSData *)address httpMode:(BOOL)httpMode
 {
     //NSLog(@"didStartWithAddress");
-    [self.pingFoundation sendPingWithData:nil];
+    if (httpMode) {
+        [self.pingFoundation sendHttpPingWithData:@"HEAD" path:@"/"];
+    } else {
+        [self.pingFoundation sendPingWithData:nil];
+    }
 }
 
 - (void)pingFoundation:(PingFoundation *)pinger didFailWithError:(NSError *)error

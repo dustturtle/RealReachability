@@ -139,6 +139,8 @@ static uint16_t in_cksum(const void *buffer, size_t bufferLen) {
 
 #pragma mark * PingFoundation
 
+const uint16_t HttpModeSequenceNumber = 0x8888;
+
 @interface PingFoundation ()
 
 // read/write versions of public properties
@@ -167,7 +169,7 @@ static uint16_t in_cksum(const void *buffer, size_t bufferLen) {
 
 @implementation PingFoundation
 
-- (instancetype)initWithHostName:(NSString *)hostName
+- (instancetype)initWithHostName:(NSString *)hostName withHttpMode:(BOOL)httpMode
 {
     if ([hostName length] <= 0)
     {
@@ -177,6 +179,7 @@ static uint16_t in_cksum(const void *buffer, size_t bufferLen) {
     self = [super init];
     if (self != nil) {
         self->_hostName   = [hostName copy];
+        self->_httpMode = httpMode;
         self->_identifier = (uint16_t) arc4random();
     }
     return self;
@@ -318,6 +321,71 @@ static uint16_t in_cksum(const void *buffer, size_t bufferLen) {
                            self.hostAddress.bytes,
                            (socklen_t) self.hostAddress.length
                            );
+        err = 0;
+        if (bytesSent < 0) {
+            err = errno;
+        }
+    }
+    
+    // Handle the results of the send.
+    
+    strongDelegate = self.delegate;
+    if ( (bytesSent > 0) && (((NSUInteger) bytesSent) == packet.length) ) {
+        
+        // Complete success.  Tell the client.
+        
+        if ( (strongDelegate != nil) && [strongDelegate respondsToSelector:@selector(pingFoundation:didSendPacket:sequenceNumber:)] ) {
+            [strongDelegate pingFoundation:self didSendPacket:packet sequenceNumber:self.nextSequenceNumber];
+        }
+    } else {
+        NSError *   error;
+        
+        // Some sort of failure.  Tell the client.
+        
+        if (err == 0) {
+            err = ENOBUFS;          // This is not a hugely descriptor error, alas.
+        }
+        error = [NSError errorWithDomain:NSPOSIXErrorDomain code:err userInfo:nil];
+        if ( (strongDelegate != nil) && [strongDelegate respondsToSelector:@selector(pingFoundation:didFailToSendPacket:sequenceNumber:error:)] ) {
+            [strongDelegate pingFoundation:self didFailToSendPacket:packet sequenceNumber:self.nextSequenceNumber error:error];
+        }
+    }
+    
+    self.nextSequenceNumber += 1;
+    if (self.nextSequenceNumber == 0) {
+        self.nextSequenceNumberHasWrapped = YES;
+    }
+}
+
+-(void)sendHttpPingWithData:(NSString *)method path:(NSString *)path {
+    int                     err;
+    NSData *                packet;
+    ssize_t                 bytesSent;
+    id<PingFoundationDelegate>  strongDelegate;
+    
+    // data may be nil
+    
+    // Construct the ping packet.
+    
+    NSMutableString* requestString  =   [[NSMutableString alloc] init];
+    [requestString appendFormat:@"%@ %@ HTTP/1.1\r\n", [method uppercaseString], path];
+    [requestString appendFormat:@"HOST:%@\r\n", _hostName];
+    [requestString appendFormat:@"User-Agent:RealReachability\r\n"];
+    [requestString appendFormat:@"Accept-Charset: ISO-8859-1,utf-8;q=0.7,*;q=0.7\r\n\r\n"];
+    packet = [requestString dataUsingEncoding:NSUTF8StringEncoding];
+  
+    // Send the packet.
+    
+    if (self.socket == NULL) {
+        bytesSent = -1;
+        err = EBADF;
+    } else {
+        bytesSent = send(
+                           CFSocketGetNative(self.socket),
+                           packet.bytes,
+                           packet.length,
+                           0
+                         );
         err = 0;
         if (bytesSent < 0) {
             err = errno;
@@ -517,6 +585,18 @@ static uint16_t in_cksum(const void *buffer, size_t bufferLen) {
     return result;
 }
 
+- (void)connect:(BOOL)success {
+    if (success) {
+        // Done connected, we can notify upper layer to send data.
+        id<PingFoundationDelegate> strongDelegate = self.delegate;
+        if ( (strongDelegate != nil) && [strongDelegate respondsToSelector:@selector(pingFoundation:didStartWithAddress:httpMode:)] ) {
+            [strongDelegate pingFoundation:self didStartWithAddress:self.hostAddress httpMode:self.httpMode];
+        }
+    } else {
+         [self didFailWithError:[NSError errorWithDomain:(NSString *)kCFErrorDomainCFNetwork code:kCFURLErrorCannotConnectToHost userInfo:nil]];
+    }
+}
+            
 /*! Reads data from the ICMP socket.
  *  \details Called by the socket handling code (SocketReadCallback) to process an ICMP
  *      message waiting on the socket.
@@ -553,21 +633,44 @@ static uint16_t in_cksum(const void *buffer, size_t bufferLen) {
     // Process the data we read.
     
     if (bytesRead > 0) {
-        NSMutableData *         packet;
         id<PingFoundationDelegate>  strongDelegate;
-        uint16_t                sequenceNumber;
-        
-        packet = [NSMutableData dataWithBytes:buffer length:(NSUInteger) bytesRead];
-        // We got some data, pass it up to our client.
         
         strongDelegate = self.delegate;
-        if ( [self validatePingResponsePacket:packet sequenceNumber:&sequenceNumber] ) {
-            if ( (strongDelegate != nil) && [strongDelegate respondsToSelector:@selector(pingFoundation:didReceivePingResponsePacket:sequenceNumber:)] ) {
-                [strongDelegate pingFoundation:self didReceivePingResponsePacket:packet sequenceNumber:sequenceNumber];
+        
+        if (_httpMode) {
+            char previous = (char)0;
+            for (int i = 0; i < bytesRead; i++) {
+                if (previous == '\r' && ((char *)buffer)[i] == '\n') {
+                    // Valid split, try to parse first segment.
+                    NSString* httpStatus = [[NSString alloc]initWithBytes:buffer length:i-1 encoding:kCFStringEncodingUTF8];
+                    if ([httpStatus hasPrefix:@"HTTP/"]) {
+                        if ( (strongDelegate != nil) && [strongDelegate respondsToSelector:@selector(pingFoundation:didReceivePingResponsePacket:sequenceNumber:)] ) {
+                            [strongDelegate pingFoundation:self didReceivePingResponsePacket:nil sequenceNumber:HttpModeSequenceNumber];
+                        }
+                    } else {
+                        if ( (strongDelegate != nil) && [strongDelegate respondsToSelector:@selector(pingFoundation:didReceiveUnexpectedPacket:)] ) {
+                            [strongDelegate pingFoundation:self didReceiveUnexpectedPacket:nil];
+                        }
+                    }
+                    break;
+                }
+                previous = ((char *)buffer)[i];
             }
         } else {
-            if ( (strongDelegate != nil) && [strongDelegate respondsToSelector:@selector(pingFoundation:didReceiveUnexpectedPacket:)] ) {
-                [strongDelegate pingFoundation:self didReceiveUnexpectedPacket:packet];
+            uint16_t                sequenceNumber;
+            NSMutableData *         packet;
+            
+            packet = [NSMutableData dataWithBytes:buffer length:(NSUInteger) bytesRead];
+            // We got some data, pass it up to our client.
+            
+            if ( [self validatePingResponsePacket:packet sequenceNumber:&sequenceNumber] ) {
+                if ( (strongDelegate != nil) && [strongDelegate respondsToSelector:@selector(pingFoundation:didReceivePingResponsePacket:sequenceNumber:)] ) {
+                    [strongDelegate pingFoundation:self didReceivePingResponsePacket:packet sequenceNumber:sequenceNumber];
+                }
+            } else {
+                if ( (strongDelegate != nil) && [strongDelegate respondsToSelector:@selector(pingFoundation:didReceiveUnexpectedPacket:)] ) {
+                    [strongDelegate pingFoundation:self didReceiveUnexpectedPacket:packet];
+                }
             }
         }
     } else {
@@ -584,6 +687,20 @@ static uint16_t in_cksum(const void *buffer, size_t bufferLen) {
     
     // Note that we don't loop back trying to read more data.  Rather, we just
     // let CFSocket call us again.
+}
+
+static void SocketCallback(CFSocketRef s, CFSocketCallBackType type, CFDataRef address, const void *data, void *info) {
+    // This C routine is called by CFSocket when there's data waiting on our
+    // ICMP socket.  It just redirects the call to Objective-C code.
+    PingFoundation *    obj;
+    
+    obj = (__bridge PingFoundation *) info;
+    
+    if (type == kCFSocketConnectCallBack) {
+        [obj connect:data == NULL ? YES : NO];
+    } else if (type == kCFSocketReadCallBack) {
+        [obj readData];
+    }
 }
 
 /*! The callback for our CFSocket object.
@@ -629,13 +746,21 @@ static void SocketReadCallback(CFSocketRef s, CFSocketCallBackType type, CFDataR
     switch (self.hostAddressFamily) {
             // gzw here to decide what to use! see what is going on in iOS12! TODO:
         case AF_INET: {
-            fd = socket(AF_INET, SOCK_DGRAM, IPPROTO_ICMP);
+            if (_httpMode) {
+                fd = socket(AF_INET, SOCK_STREAM, IPPROTO_IP);
+            } else {
+                fd = socket(AF_INET, SOCK_DGRAM, IPPROTO_ICMP);
+            }
             if (fd < 0) {
                 err = errno;
             }
         } break;
         case AF_INET6: {
-            fd = socket(AF_INET6, SOCK_DGRAM, IPPROTO_ICMPV6);
+            if (_httpMode) {
+                fd = socket(AF_INET6, SOCK_STREAM,IPPROTO_IPV6);
+            } else {
+                fd = socket(AF_INET6, SOCK_DGRAM, IPPROTO_ICMPV6);
+            }
             if (fd < 0) {
                 err = errno;
             }
@@ -652,10 +777,19 @@ static void SocketReadCallback(CFSocketRef s, CFSocketCallBackType type, CFDataR
         CFRunLoopSourceRef      rls;
         id<PingFoundationDelegate>  strongDelegate;
         
-        // Wrap it in a CFSocket and schedule it on the runloop.
-        
-        self.socket = (CFSocketRef) CFAutorelease( CFSocketCreateWithNative(NULL, fd, kCFSocketReadCallBack, SocketReadCallback, &context) );
-   
+        if (_httpMode) {
+            // Wrap it in a CFSocket and schedule it on the runloop.
+            self.socket = (CFSocketRef) CFAutorelease( CFSocketCreateWithNative(NULL, fd, kCFSocketConnectCallBack | kCFSocketReadCallBack, SocketCallback, &context) );
+            
+            CFDataRef targetAddrRef = CFDataCreate(kCFAllocatorDefault, self.hostAddress.bytes, (socklen_t) self.hostAddress.length);
+            // ----连接
+            CFSocketConnectToAddress(self.socket, targetAddrRef, -1);
+            // Release
+            CFRelease(targetAddrRef);
+        } else {
+            // Wrap it in a CFSocket and schedule it on the runloop.
+            self.socket = (CFSocketRef) CFAutorelease( CFSocketCreateWithNative(NULL, fd, kCFSocketReadCallBack, SocketReadCallback, &context) );
+        }
         // The socket will now take care of cleaning up our file descriptor.
         
         fd = -1;
@@ -666,9 +800,11 @@ static void SocketReadCallback(CFSocketRef s, CFSocketCallBackType type, CFDataR
         
         CFRelease(rls);
         
-        strongDelegate = self.delegate;
-        if ( (strongDelegate != nil) && [strongDelegate respondsToSelector:@selector(pingFoundation:didStartWithAddress:)] ) {
-            [strongDelegate pingFoundation:self didStartWithAddress:self.hostAddress];
+        if (!_httpMode) {
+            strongDelegate = self.delegate;
+            if ( (strongDelegate != nil) && [strongDelegate respondsToSelector:@selector(pingFoundation:didStartWithAddress:httpMode:)] ) {
+                [strongDelegate pingFoundation:self didStartWithAddress:self.hostAddress httpMode:self.httpMode];
+            }
         }
     }
 }
@@ -696,13 +832,27 @@ static void SocketReadCallback(CFSocketRef s, CFSocketCallBackType type, CFDataR
                 switch (addrPtr->sa_family) {
                     case AF_INET: {
                         if (self.addressStyle != PingFoundationAddressStyleICMPv6) {
-                            self.hostAddress = address;
+                            if (_httpMode) {
+                                NSMutableData* mutableAddress = [NSMutableData dataWithBytes:address.bytes length:address.length];
+                                struct sockaddr_in* addrInPtr = (struct sockaddr_in*) mutableAddress.mutableBytes;
+                                addrInPtr->sin_port = htons(80);
+                                self.hostAddress = mutableAddress;
+                            } else {
+                                self.hostAddress = address;
+                            }
                             resolved = true;
                         }
                     } break;
                     case AF_INET6: {
                         if (self.addressStyle != PingFoundationAddressStyleICMPv4) {
-                            self.hostAddress = address;
+                            if (_httpMode) {
+                                NSMutableData* mutableAddress = [NSMutableData dataWithBytes:address.bytes length:address.length];
+                                struct sockaddr_in6* addrInPtr = (struct sockaddr_in6*) mutableAddress.mutableBytes;
+                                addrInPtr->sin6_port = htons(80);
+                                self.hostAddress = mutableAddress;
+                            } else {
+                                self.hostAddress = address;
+                            }
                             resolved = true;
                         }
                     } break;
