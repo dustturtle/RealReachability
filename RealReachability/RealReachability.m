@@ -212,9 +212,10 @@ NSString *const kRRVPNStatusChangedNotification = @"kRRVPNStatusChangedNotificat
     }
     
     __weak __typeof(self)weakSelf = self;
-    [self.pingHelper pingWithBlock:^(BOOL isSuccess)
+    [self.pingHelper pingWithBlock:^(BOOL isSuccess, NSTimeInterval latency)
      {
          __strong __typeof(weakSelf)strongSelf = weakSelf;
+         strongSelf.latency = latency;
          if (isSuccess)
          {
              ReachabilityStatus status = [self currentReachabilityStatus];
@@ -347,8 +348,9 @@ NSString *const kRRVPNStatusChangedNotification = @"kRRVPNStatusChangedNotificat
 - (void)makeDoubleCheck:(void (^)(ReachabilityStatus status))asyncHandler
 {
     __weak __typeof(self)weakSelf = self;
-    [self.pingChecker pingWithBlock:^(BOOL isSuccess) {
+    [self.pingChecker pingWithBlock:^(BOOL isSuccess, NSTimeInterval latency) {
         __strong __typeof(weakSelf)strongSelf = weakSelf;
+        strongSelf.latency = latency;
         ReachabilityStatus status = [strongSelf currentReachabilityStatus];
         
         NSDictionary *inputDic = @{kEventKeyID:@(RREventPingCallback), kEventKeyParam:@(isSuccess)};
