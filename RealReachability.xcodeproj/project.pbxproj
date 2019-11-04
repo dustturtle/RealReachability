@@ -8,7 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		7F3A815F1D5220D6004B78CE /* RealReachability.h in Headers */ = {isa = PBXBuildFile; fileRef = 7F3A815E1D5220D6004B78CE /* RealReachability.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		7F3A81821D522132004B78CE /* LocalConnection.h in Headers */ = {isa = PBXBuildFile; fileRef = 7F3A81671D522132004B78CE /* LocalConnection.h */; };
+		7F3A81821D522132004B78CE /* LocalConnection.h in Headers */ = {isa = PBXBuildFile; fileRef = 7F3A81671D522132004B78CE /* LocalConnection.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		7F3A81831D522132004B78CE /* LocalConnection.m in Sources */ = {isa = PBXBuildFile; fileRef = 7F3A81681D522132004B78CE /* LocalConnection.m */; };
 		7F3A81841D522132004B78CE /* FSMDefines.h in Headers */ = {isa = PBXBuildFile; fileRef = 7F3A816A1D522132004B78CE /* FSMDefines.h */; };
 		7F3A81851D522132004B78CE /* FSMEngine.h in Headers */ = {isa = PBXBuildFile; fileRef = 7F3A816B1D522132004B78CE /* FSMEngine.h */; };
@@ -156,12 +156,12 @@
 			buildActionMask = 2147483647;
 			files = (
 				7F3A81971D522132004B78CE /* PingHelper.h in Headers */,
+				7F3A81821D522132004B78CE /* LocalConnection.h in Headers */,
 				7F3A81841D522132004B78CE /* FSMDefines.h in Headers */,
 				7F3A81851D522132004B78CE /* FSMEngine.h in Headers */,
 				7F3A818D1D522132004B78CE /* ReachStateUnloaded.h in Headers */,
 				7F3A81891D522132004B78CE /* ReachState.h in Headers */,
 				7F3A81931D522132004B78CE /* ReachStateWWAN.h in Headers */,
-				7F3A81821D522132004B78CE /* LocalConnection.h in Headers */,
 				7F3A81911D522132004B78CE /* ReachStateWIFI.h in Headers */,
 				7F3A818B1D522132004B78CE /* ReachStateLoading.h in Headers */,
 				7F3A81871D522132004B78CE /* FSMStateUtil.h in Headers */,
@@ -211,6 +211,7 @@
 			developmentRegion = English;
 			hasScannedForEncodings = 0;
 			knownRegions = (
+				English,
 				en,
 			);
 			mainGroup = 7F3A81511D5220D6004B78CE;
