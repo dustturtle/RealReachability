@@ -201,7 +201,7 @@
     {
         for (void (^completion)(BOOL, NSTimeInterval) in self.completionBlocks)
         {
-            completion(NO, 0);
+            completion(NO, self.timeout);
         }
         [self.completionBlocks removeAllObjects];
     }
