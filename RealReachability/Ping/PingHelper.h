@@ -25,6 +25,6 @@
  *
  *  @param completion : Async completion block
  */
-- (void)pingWithBlock:(void (^)(BOOL isSuccess))completion;
+- (void)pingWithBlock:(void (^)(BOOL isSuccess, NSTimeInterval latency))completion;
 
 @end

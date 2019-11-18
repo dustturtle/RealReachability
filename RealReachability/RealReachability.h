@@ -84,6 +84,9 @@ typedef NS_ENUM(NSInteger, WWANAccessType) {
 // Timeout used for ping. Default is 2 seconds
 @property (nonatomic, assign) NSTimeInterval pingTimeout;
 
+// Latency from latest ping result
+@property (nonatomic, assign) NSTimeInterval latency;
+
 + (instancetype)sharedInstance;
 
 - (void)startNotifier;

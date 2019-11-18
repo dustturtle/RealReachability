@@ -18,6 +18,7 @@
 @property (nonatomic, strong) NSMutableArray *completionBlocks;
 @property(nonatomic, strong) PingFoundation *pingFoundation;
 @property (nonatomic, assign) BOOL isPinging;
+@property (nonatomic, assign) CFAbsoluteTime pingStartTime;
 
 @end
 
@@ -46,7 +47,7 @@
 
 #pragma mark - actions
 
-- (void)pingWithBlock:(void (^)(BOOL isSuccess))completion
+- (void)pingWithBlock:(void (^)(BOOL isSuccess, NSTimeInterval latency))completion
 {
     //NSLog(@"pingWithBlock");
     if (completion)
@@ -94,6 +95,9 @@
     
     self.isPinging = YES;
     
+    self.pingStartTime = CFAbsoluteTimeGetCurrent();
+
+    
     self.pingFoundation = [[PingFoundation alloc] initWithHostName:self.host];
     self.pingFoundation.delegate = self;
     [self.pingFoundation start];
@@ -138,13 +142,17 @@
     }
     
     self.isPinging = NO;
+    
+    CFAbsoluteTime end = CFAbsoluteTimeGetCurrent();
+    NSTimeInterval latency = isSuccess ? (end - self.pingStartTime) * 1000 : 0;
+
     [self clearPingFoundation];
     
     @synchronized(self)
     {
-        for (void (^completion)(BOOL) in self.completionBlocks)
+        for (void (^completion)(BOOL, NSTimeInterval) in self.completionBlocks)
         {
-            completion(isSuccess);
+            completion(isSuccess, latency);
         }
         [self.completionBlocks removeAllObjects];
     }
@@ -191,9 +199,9 @@
     
     @synchronized(self)
     {
-        for (void (^completion)(BOOL) in self.completionBlocks)
+        for (void (^completion)(BOOL, NSTimeInterval) in self.completionBlocks)
         {
-            completion(NO);
+            completion(NO, self.timeout);
         }
         [self.completionBlocks removeAllObjects];
     }
