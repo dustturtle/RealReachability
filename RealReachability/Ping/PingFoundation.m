@@ -314,7 +314,7 @@ static uint16_t in_cksum(const void *buffer, size_t bufferLen) {
                            CFSocketGetNative(self.socket),
                            packet.bytes,
                            packet.length,
-                           0,
+                           SO_NOSIGPIPE,
                            self.hostAddress.bytes,
                            (socklen_t) self.hostAddress.length
                            );

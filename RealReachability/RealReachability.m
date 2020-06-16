@@ -328,7 +328,23 @@ NSString *const kRRVPNStatusChangedNotification = @"kRRVPNStatusChangedNotificat
     if ([[[UIDevice currentDevice] systemVersion] floatValue] >= 7.0)
     {
         CTTelephonyNetworkInfo *teleInfo = [[CTTelephonyNetworkInfo alloc] init];
-        NSString *accessString = teleInfo.currentRadioAccessTechnology;
+        NSString *accessString = @"";
+        
+        if (@available(iOS 12.0, *))
+        {
+            // dual sim, maybe dual cards, simple choose one.
+            NSDictionary *infoDic = teleInfo.serviceCurrentRadioAccessTechnology;
+            NSArray *accessStrings = infoDic.allValues;
+            if (accessStrings.count > 0)
+            {
+                accessString = accessStrings[0];
+            }
+        }
+        else
+        {
+            accessString = teleInfo.currentRadioAccessTechnology;
+        }
+        
         if ([accessString length] > 0)
         {
             return [self accessTypeForString:accessString];
