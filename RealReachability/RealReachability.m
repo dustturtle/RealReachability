@@ -37,6 +37,7 @@ NSString *const kRRVPNStatusChangedNotification = @"kRRVPNStatusChangedNotificat
 @property (nonatomic, strong) FSMEngine *engine;
 @property (nonatomic, assign) BOOL isNotifying;
 
+@property (nonatomic,strong) NSArray *typeStrings5G;
 @property (nonatomic,strong) NSArray *typeStrings4G;
 @property (nonatomic,strong) NSArray *typeStrings3G;
 @property (nonatomic,strong) NSArray *typeStrings2G;
@@ -75,6 +76,8 @@ NSString *const kRRVPNStatusChangedNotification = @"kRRVPNStatusChangedNotificat
                            CTRadioAccessTechnologyeHRPD];
         
         _typeStrings4G = @[CTRadioAccessTechnologyLTE];
+        
+        _typeStrings5G = @[@"CTRadioAccessTechnologyNR", @"CTRadioAccessTechnologyNRNSA"];
         
         _hostForPing = kDefaultHost;
         _hostForCheck = kDefaultHost;
@@ -448,7 +451,11 @@ NSString *const kRRVPNStatusChangedNotification = @"kRRVPNStatusChangedNotificat
 
 - (WWANAccessType)accessTypeForString:(NSString *)accessString
 {
-    if ([self.typeStrings4G containsObject:accessString])
+    if ([self.typeStrings5G containsObject:accessString])
+    {
+        return WWANType5G;
+    }
+    else if ([self.typeStrings4G containsObject:accessString])
     {
         return WWANType4G;
     }

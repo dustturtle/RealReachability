@@ -48,6 +48,7 @@ typedef NS_ENUM(NSInteger, ReachabilityStatus) {
 
 typedef NS_ENUM(NSInteger, WWANAccessType) {
     WWANTypeUnknown = -1, /// maybe iOS6
+    WWANType5G = 2,
     WWANType4G = 0,
     WWANType3G = 1,
     WWANType2G = 3
@@ -120,7 +121,7 @@ typedef NS_ENUM(NSInteger, WWANAccessType) {
 /**
  *  Return current WWAN type immediately.
  *
- *  @return unknown/4g/3g/2g.
+ *  @return unknown/5g/4g/3g/2g.
  *
  *  This method can be used to improve app's further network performance
  *  (different strategies for different WWAN types).
