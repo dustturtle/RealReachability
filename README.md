@@ -1,8 +1,8 @@
 # RealReachability
-[![Version](https://img.shields.io/badge/pod-1.3.0-yellow.svg)](http://cocoadocs.org/docsets/RealReachability/1.3.0/)
-[![License](https://img.shields.io/badge/License-MIT-blue.svg)](http://cocoadocs.org/docsets/RealReachability/1.3.0)
-[![Platform](https://img.shields.io/badge/Platform-iOS-orange.svg)](http://cocoadocs.org/docsets/RealReachability/1.3.0/)
-[![Platform](https://img.shields.io/badge/Build-Passed-green.svg)](http://cocoadocs.org/docsets/RealReachability/1.3.0/)
+[![Version](https://img.shields.io/badge/pod-1.4.1-yellow.svg)](http://cocoadocs.org/docsets/RealReachability/1.4.1/)
+[![License](https://img.shields.io/badge/License-MIT-blue.svg)](http://cocoadocs.org/docsets/RealReachability/1.4.1)
+[![Platform](https://img.shields.io/badge/Platform-iOS-orange.svg)](http://cocoadocs.org/docsets/RealReachability/1.4.1/)
+[![Platform](https://img.shields.io/badge/Build-Passed-green.svg)](http://cocoadocs.org/docsets/RealReachability/1.4.1/)
 #### We need to observe the REAL reachability of network for iOS. That's what RealReachability do.
 
 # Why RealReachability?
