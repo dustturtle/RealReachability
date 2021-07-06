@@ -194,5 +194,10 @@ Please use and improve! Patches accepted, or create an issue.
 
 I'd love it if you could send me a note as to which app you're using it with! Thank you!
 
+## 支持我
+
+老司机技术周报出品的《WWDC 内参》系列，一直是 iOS 开发的精品阅读，几乎涵盖了每年需要了解的所有 iOS 新技术。尤其是今年《WWDC21 内参》的质量比去年有了比较大的提升, 作为作者之一，在这里安利给大家： https://xiaozhuanlan.com/wwdc21?rel=4203097925。目前活动价五折销售，抓紧入手啦。
+
+
 ## [中文版使用指南](http://blog.csdn.net/openglnewbee/article/details/50705146)
 
