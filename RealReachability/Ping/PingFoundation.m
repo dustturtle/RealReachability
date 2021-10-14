@@ -658,8 +658,6 @@ static void SocketReadCallback(CFSocketRef s, CFSocketCallBackType type, CFDataR
    
         // The socket will now take care of cleaning up our file descriptor.
         
-        fd = -1;
-        
         rls = CFSocketCreateRunLoopSource(NULL, self.socket, 0);
         
         CFRunLoopAddSource(CFRunLoopGetCurrent(), rls, kCFRunLoopDefaultMode);
