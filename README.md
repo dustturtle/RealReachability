@@ -9,7 +9,7 @@
 
 This repository is now **legacy** and is no longer actively maintained. 
 
-### 🚀 Please migrate to [RealReachability2](https://github.com/dustturtle/RealReachability2)! I am working on it now! 
+### 🚀 Please migrate to [RealReachability2](https://github.com/dustturtle/RealReachability2)! Version 1.0 released yet!
 
 
 # RealReachability2
