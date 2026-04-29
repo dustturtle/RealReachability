@@ -1,0 +1,48 @@
+name: Xcode Build
+
+on:
+  pull_request:
+  push:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: macos-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4.2.2
+
+      - name: Select Xcode 26.4 when available
+        run: |
+          set -euxo pipefail
+          ls -1 /Applications | grep '^Xcode' || true
+          target="/Applications/Xcode_26.4.app/Contents/Developer"
+          if [ -d "$target" ]; then
+            sudo xcode-select -switch "$target"
+          fi
+          xcodebuild -version
+
+      - name: Build RealReachability framework
+        run: |
+          set -euxo pipefail
+          xcodebuild \
+            -project RealReachability.xcodeproj \
+            -scheme RealReachability \
+            -configuration Debug \
+            -sdk iphonesimulator \
+            -destination 'generic/platform=iOS Simulator' \
+            CODE_SIGNING_ALLOWED=NO \
+            build
+
+      - name: Build sample app
+        run: |
+          set -euxo pipefail
+          xcodebuild \
+            -project testRealReachability.xcodeproj \
+            -scheme testRealReachability \
+            -configuration Debug \
+            -sdk iphonesimulator \
+            -destination 'generic/platform=iOS Simulator' \
+            CODE_SIGNING_ALLOWED=NO \
+            build
