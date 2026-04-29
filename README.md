@@ -55,7 +55,7 @@ To integrate RealReachability into your Xcode project using CocoaPods, specify i
 
 ```ruby
 source 'https://github.com/CocoaPods/Specs.git'
-platform :ios, '8.0'
+platform :ios, '12.0'
 
 pod 'RealReachability'
 ```
@@ -216,4 +216,3 @@ I'd love it if you could send me a note as to which app you're using it with! Th
 
 
 ## [中文版使用指南](http://blog.csdn.net/openglnewbee/article/details/50705146)
-
