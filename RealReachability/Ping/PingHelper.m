@@ -110,8 +110,7 @@
     _host = nil;
     _host = [host copy];
     
-    self.pingFoundation.delegate = nil;
-    self.pingFoundation = nil;
+    [self clearPingFoundation];
     
     self.pingFoundation = [[PingFoundation alloc] initWithHostName:_host];
     
